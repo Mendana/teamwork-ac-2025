@@ -1,3 +1,4 @@
+---
 name: "🧑‍💻 Tarea de código"
 about: "Implementación o modificación de código"
 title: "[CODE] "
@@ -14,3 +15,4 @@ assignees:
 - [ ] Probar en la VM
 - [ ] Subir capturas de ejecución si aplica
 - [ ] Hacer PR a `main`
+
