@@ -1,6 +1,7 @@
 blank_issues_enabled: true
-contact_links:
-  - name: ❓ Duda general
-    url: https://github.com/Mendana/teamwork-ac-2025/discussions
+# contact_links:
+#   - name: ❓ Duda general
+#     url: https://github.com/Mendana/teamwork-ac-2025/discussions
 
-    about: Usa discusiones para preguntas que no sean tareas específicas
+#     about: Usa discusiones para preguntas que no sean tareas específicas
+
