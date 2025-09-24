@@ -1,5 +1,17 @@
 blank_issues_enabled: false
 contact_links:
-  - name: ❓ Duda general
+  - name: "❓ Consulta general o duda técnica"
     url: https://github.com/Mendana/teamwork-ac-2025/discussions
-    about: Usa discusiones para preguntas que no sean tareas específicas
+    about: "Utiliza las discusiones para preguntas generales, dudas técnicas que no requieren una tarea específica, o para proponer ideas y mejoras al proyecto"
+  
+  - name: "🐛 Reporte de bug urgente"
+    url: https://github.com/Mendana/teamwork-ac-2025/issues/new?template=bug_report.md
+    about: "Para reportar errores críticos que requieren atención inmediata y no encajan en las categorías de tareas estándar"
+  
+  - name: "💡 Propuesta de mejora"
+    url: https://github.com/Mendana/teamwork-ac-2025/discussions/categories/ideas
+    about: "Sugiere nuevas funcionalidades, optimizaciones o cambios al proyecto que requieren discusión previa"
+  
+  - name: "📚 Documentación del proyecto"
+    url: https://github.com/Mendana/teamwork-ac-2025/wiki
+    about: "Consulta la documentación técnica completa, guías de desarrollo y recursos del proyecto"
