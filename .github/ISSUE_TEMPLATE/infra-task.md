@@ -1,8 +1,9 @@
+---
 name: "🛠️ Infraestructura"
 about: "Tareas de configuración, entorno y recursos"
 title: "[INFRA] "
 labels: ["infraestructura"]
-assignees:
+assignees: []
 ---
 
 ## Descripción

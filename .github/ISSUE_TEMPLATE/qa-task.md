@@ -1,8 +1,9 @@
+---
 name: "✅ QA / Revisión"
 about: "Revisión de código, documentación o resultados"
 title: "[QA] "
 labels: ["QA", "review"]
-assignees:
+assignees: []
 ---
 
 ## Elemento a revisar

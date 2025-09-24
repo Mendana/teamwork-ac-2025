@@ -1,8 +1,9 @@
+---
 name: "🧑‍💻 Tarea de código"
 about: "Implementación o modificación de código"
 title: "[CODE] "
 labels: ["código"]
-assignees: 
+assignees: [] 
 ---
 
 ## Descripción
