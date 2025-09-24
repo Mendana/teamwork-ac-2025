@@ -1,3 +1,4 @@
+---
 name: "✅ QA / Revisión"
 about: "Revisión de código, documentación o resultados"
 title: "[QA] "

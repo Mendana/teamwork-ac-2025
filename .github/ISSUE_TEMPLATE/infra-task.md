@@ -1,3 +1,4 @@
+---
 name: "🛠️ Infraestructura"
 about: "Tareas de configuración, entorno y recursos"
 title: "[INFRA] "

@@ -1,3 +1,4 @@
+---
 name: "📄 Tarea de documentación"
 about: "Escritura o mejora de la memoria/documentación"
 title: "[DOCS] "
