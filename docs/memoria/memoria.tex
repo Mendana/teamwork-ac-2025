@@ -1,0 +1,234 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amsfonts, amssymb, mathtools} % Podemos añadir amssymb, amsthm o bm
+\usepackage{graphicx, xparse}
+\usepackage[top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry} % Este paquete permite modificar los márgenes del documento
+\usepackage[colorlinks=true, allcolors=blue]{hyperref} % Se indica que los hipervínculos van todos en azul
+\usepackage{setspace}
+\usepackage{xcolor, tcolorbox, booktabs, multirow, colortbl}
+\usepackage{cancel} %tachar cosas
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.geometric,fit,backgrounds}
+\usepackage{listings, lstautogobble}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{fontspec}
+\usepackage{makecell}
+\usepackage{nicematrix}
+
+\newfontfamily\myfont{Consolas}
+
+\graphicspath{ {images/}}
+
+
+
+% Definir lenguaje MiAssembly
+\lstdefinelanguage{MiAssembly}{
+    keywords={MOV, ADD, SUB, STR, LDR, JMP, CALL, RET, PUSH, POP, MOVL, MOVH, AND, OR, XOR, INC, DEC, NOT, NEG, CMP, JMP, BRC, BRNC, BRO, BRNO, BRZ, BRNZ, BRS, BRNS, JGE, LEA, JNE, JE, MOVSX, SHL, IMUL}, % Instrucciones de ensamblador
+    keywordstyle=\color{blue}\bfseries,
+    morekeywords=[2]{r0, r1, r2, r3, r4, r5, r6, r7, SP, PC}, % Registros
+    keywordstyle=[2]\color{purple}\bfseries,
+    morecomment=[l]{;}, % Comentarios con ;
+    commentstyle=\color{gray}\itshape,
+    morestring=[b]", % Cadenas entre comillas dobles
+    stringstyle=\color{verdeSuave},
+    sensitive=true, % Diferencia entre mayúsculas y minúsculas
+}
+
+% Estilo para Assembly
+\lstdefinestyle{assemblyStyle}{
+    language=MiAssembly,
+    inputencoding=utf8,
+    basicstyle=\ttfamily\footnotesize,
+    stringstyle=\ttfamily\color{verdeSuave},
+    commentstyle=\ttfamily\itshape\color{gray},
+    keywordstyle=\color{blue}\bfseries,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    xleftmargin=10pt,
+    frame=shadowbox,
+    breaklines=true,
+    extendedchars=true,    
+    autogobble=true,
+    tabsize=4,
+    literate=%
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+% Estilo para C++
+\lstdefinestyle{cppStyle}{
+    language=C++,
+    inputencoding=utf8,
+    basicstyle=\ttfamily\footnotesize,
+    stringstyle=\ttfamily\color{verdeSuave},
+    commentstyle=\ttfamily\itshape\color{gray},
+    keywordstyle=\color{blue}\bfseries,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    xleftmargin=10pt,
+    frame=trBl,
+    frameround=tttt,
+    backgroundcolor=\color{gray!20},
+    breaklines=true,
+    extendedchars=true,    
+    autogobble=true,
+    tabsize=4,
+    literate=%
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+
+
+
+
+%Colores
+\definecolor{blanco}{HTML}{FFFFFF}
+\definecolor{negro}{HTML}{000000}
+\definecolor{azulSuave}{HTML}{6ac9d5}
+\definecolor{naranjaSuave}{HTML}{d5956a}
+\definecolor{verdeSuave}{HTML}{6ad578}
+\definecolor{verdeHoja}{HTML}{006400}
+\definecolor{naranjaDuro}{HTML}{bd2d0e}
+
+
+
+\titleformat{\part}[display]
+  {\normalfont\Huge\bfseries} % Estilo del texto
+  {}           % Prefijo antes del título de la parte
+  {20pt}                      % Separación entre "Parte I" y el título
+  {\Huge}                     % Estilo del título de la parte
+
+
+
+%Colores
+\definecolor{blanco}{HTML}{FFFFFF}
+\definecolor{negro}{HTML}{000000}
+\definecolor{azulSuave}{HTML}{6ac9d5}
+\definecolor{naranjaSuave}{HTML}{d5956a}
+\definecolor{verdeSuave}{HTML}{6ad578}
+\definecolor{magenta}{HTML}{FF00FF}
+\definecolor{dorado}{HTML}{ad8a1f}
+\definecolor{amarilloPastel}{RGB}{255, 249, 196} % Amarillo pastel claro
+\definecolor{amarilloOscuro}{RGB}{253, 216, 100}  % Amarillo más oscuro
+\definecolor{grisSuave}{RGB}{230, 230, 230}      % Gris suave
+\definecolor{negro}{RGB}{0, 0, 0}                % Negro puro
+
+\newtcolorbox{dem_box}[1]{
+before=\par\smallskip\centering,
+colframe=azulSuave!70,
+colback=white,
+fonttitle=\bfseries,
+coltitle=negro,
+title=#1,
+flushleft title,
+width=1\linewidth,
+breakable = true
+}
+
+\newtcolorbox{ejem_box}[1]{
+before=\par\smallskip\centering,
+colframe=verdeSuave!70,
+colback=white,
+fonttitle=\bfseries,
+coltitle=negro,
+title=#1,
+flushleft title,
+width=1\linewidth,
+breakable = true
+}
+
+\newtcolorbox{ej_box}[1]{
+before=\par\smallskip\centering,
+colframe=naranjaSuave!70,
+colback=white,
+fonttitle=\bfseries,
+coltitle=negro,
+title=#1,
+flushleft title,
+width=1\linewidth,
+breakable = true
+}
+
+\newtcolorbox{mod_box}[1]{
+before=\par\smallskip\centering,
+colframe=amarilloOscuro!85,
+colback=amarilloPastel!30,
+fonttitle=\bfseries,
+coltitle=negro,
+title=#1,
+flushleft title,
+width=0.94\textwidth,
+breakable = true
+}
+
+
+
+\setstretch{1.2}
+\decimalpoint
+
+% \title{\textbf{BASES DE DATOS: } EJERCICIOS RESUELTOS}
+% \author{Diego Díaz Mendaña}
+%\date{Fecha}
+
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        % Logo de la institución
+        \includegraphics[width=0.3\textwidth]{logo_escuela.png} \\[1cm] % Cambiar logo_escuela por el nombre del archivo con el logo
+        \vspace{1cm}
+        
+        \textbf{\LARGE ESCUELA DE INGENIERÍA INFORMÁTICA DE OVIEDO} \\[1.5cm]
+        
+        \rule{\linewidth}{0.5mm} \\[0.4cm]
+        \textbf{\Huge Arquitectura de Computadores} \\[0.3cm]
+        \rule{\linewidth}{0.5mm} \\[1cm]
+        
+        {\Large Curso 2025-2026} \\[1.5cm]
+        
+        \textbf{\LARGE Teamwork} \\[0.8cm]
+        
+        \text{Díaz Mendaña, Diego - UO301887}\\[0.15cm]
+        \text{García Pernas, Pablo - UO300167}\\[0.15cm]
+        \text{Rama García, Mateo - UO}\\[0.15cm]
+        \text{Suárez Fernández, Fernando - UO300028}
+        
+        \vfill
+        
+        % Información del alumno
+        \begin{flushright}
+            \textbf{Grupo de prácticas:} PL.1 - B \\[0.3cm]
+            \textbf{Titulación:} PCEO Informática y Matemáticas \\[0.3cm]
+        \end{flushright}
+        
+        \vfill
+        
+        \today \\[1cm]
+    \end{center}
+  \end{titlepage}
+
+\newpage
+\hypersetup{linkcolor=black}
+\tableofcontents
+\hypersetup{linkcolor=blue}
+\newpage
+
+\section{Introducción}
+La presente memoria tiene por objetivo documentar de manera exhaustiva el desarrollo de la Fase II del trabajo práctico correspondiente a la asignatura \textbf{Fundamentos de Computadores y Redes}. El propósito fundamental de esta fase consiste en profundizar en los conceptos generales abordados previamente en los laboratorios de la materia, aplicándolos en un contexto de análisis práctico. \vspace{2ex}
+
+\noindent En particular, la práctica propuesta requiere llevar a cabo el análisis detallado del código fuente de un programa, utilizando para ello las herramientas de depuración que proporciona el entorno de desarrollo \textbf{Visual Studio}. A través de este análisis, se pretende identificar las palabras clave necesarias para la desactivación de una ``bomba binaria''. Como actividad final, se procederá a modificar el código de manera que la bomba no explote independientemente de las entradas proporcionadas por el usuario. \vspace{2ex}
+
+\vspace{3ex}
+
+\section{Desarrollo del análisis de las palabras clave}
+
+El programa objeto de análisis ha sido suministrado por el profesor de la asignatura y se encuentra ubicado en la carpeta denominada \textit{bomba} de este repositorio, concretamente en el archivo ejecutable \texttt{main.exe}. Este ejecutable, diseñado para el sistema operativo Windows, solicita durante su ejecución una serie de entradas por parte del usuario. En caso de que dichas entradas sean correctas, el programa continúa su ejecución sin incidentes, en caso contrario, la ``bomba'' programada explota (la demostración de este comportamiento queda fuera del alcance de la presente memoria). \vspace{2ex}
+
+\end{document}
