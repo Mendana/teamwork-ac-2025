@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.4) (preloaded format=xelatex 2025.9.10)  26 SEP 2025 12:57
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.4) (preloaded format=xelatex 2025.9.10)  26 SEP 2025 18:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1156,93 +1156,26 @@ File: images/logo_escuela.png Graphic file (type bmp)
 ] (memoria.toc
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 7.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 8.
 
 (C:\Users\menda\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 7.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 8.
 
 (C:\Users\menda\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
-
-[1])
+))
 \tf@toc=\write5
 \openout5 = `memoria.toc'.
 
 
 
+[1]
+
 [2]
 
-[3]
-
-[4]
-(C:\Users\menda\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2024/09/23 1.10c listings language file
-)
-(C:\Users\menda\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2024/09/23 1.10c listings language file
-)
-(C:\Users\menda\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
-File: lstmisc.sty 2024/09/23 1.10c (Carsten Heinz)
-)
-
-[5]
-
-Package inputenc Warning: inputenc package ignored with utf8 based engines.
-
-
-Package inputenc Warning: inputenc package ignored with utf8 based engines.
-
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <9> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 355.
-
-
-[6]
-
-Package inputenc Warning: inputenc package ignored with utf8 based engines.
-
-
-
-[7]
-
-Package inputenc Warning: inputenc package ignored with utf8 based engines.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Overfull \hbox (56.1291pt too wide) in paragraph at lines 523--524
-[]\TU/lmr/m/n/10.95 Intel Intrinsics Guide: [][]$[][][][][] [] [] [] [][][][][]
-[][][] [] [][][][][] [] [][][] [] [][][][][] [] [][][][][][][][][][][] [] [][][
-][][][][][][][][][][][][][]$[][] 
- []
-
-
-
-[8]
-Overfull \hbox (2.64816pt too wide) in paragraph at lines 530--531
-[]\TU/lmr/m/n/10.95 Tommesani, T. “MMX and SSE Primer”: [][]$[][][][][] [] [] [
-] [][][] [] [][][][][][][][][] [] [][][] [] [][][][][][][][][] []
- []
-
-
-Overfull \hbox (15.37932pt too wide) in paragraph at lines 531--532
-[]\TU/lmr/m/n/10.95 CodeProject. “Crunching Numbers with AVX and AVX2”: [][]$[]
-[][][][] [] [] [] [][][] [] [][][][][][][][][][][] []
- []
-
-
-Overfull \hbox (107.73755pt too wide) in paragraph at lines 532--533
-[]\TU/lmr/m/n/10.95 Finis, J. “x86 Intrinsics Cheat Sheet v2.2”: [][]$[][][][][
-] [] [] [] [][] [] [][] [] [][][] [] [][] [] [][][][][][] [] [][][][][][][][][]
-[][][][][][][][][][][][][][][][][][] []
- []
-
-
-
-[9] (memoria.aux
+[3] (memoria.aux
 LaTeX Info: Redefining \. on input line 12.
 LaTeX Info: Redefining \% on input line 12.
 )
@@ -1250,20 +1183,16 @@ LaTeX Info: Redefining \% on input line 12.
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-08-13>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `memoria.out' has not changed.
-(rerunfilecheck)             Checksum: C93AB050A4F8C25D4DFC06D8F08D65BB;8226.
+(rerunfilecheck)             Checksum: 81AC371D56D9B4644D16DE7FDE3E6FC7;1025.
  ) 
 Here is how much of TeX's memory you used:
- 32375 strings out of 403249
- 681176 string characters out of 5460860
- 1368350 words of memory out of 5000000
- 60370 multiletter control sequences out of 15000+600000
- 635190 words of font info for 86 fonts, out of 8000000 for 9000
+ 32028 strings out of 403249
+ 676784 string characters out of 5460860
+ 1150712 words of memory out of 5000000
+ 60035 multiletter control sequences out of 15000+600000
+ 635007 words of font info for 83 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 98i,11n,101p,592b,1242s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,5n,101p,592b,437s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on memoria.pdf (10 pages).
+Output written on memoria.pdf (4 pages).

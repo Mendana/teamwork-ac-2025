@@ -248,297 +248,34 @@ Esta memoria recoge el desarrollo del proyecto de la asignatura \textit{Arquitec
 % ANEXOS
 % ================================
 
+\part*{ANEXOS}
+
 \appendix
 \renewcommand{\thesection}{\Alph{section}}
 
 \section{Flujo de trabajo y metodología de desarrollo}
-\label{anexo:workflow}
-
-Este anexo describe la metodología de desarrollo colaborativo empleada durante el proyecto, incluyendo las herramientas utilizadas, el flujo de trabajo con Git y GitHub, y las buenas prácticas implementadas para garantizar la calidad del código.
-
-\subsection{Organización del equipo}
-
-El equipo se organizó siguiendo una metodología ágil adaptada, con roles específicos para cada miembro:
-
+Todo el desarrollo del proyecto se puede seguir en el repositorio de \textit{GitHub}: \href{https://www.github.com/Mendana/teamwork-ac-2025}{ver repositorio}. Para la gestión del proyecto y poder garantizar un desarrollo colaborativo, se ha establecido un flujo de trabajo común basado en \textit{Git} y \textit{GitHub} como herramientas centrales de organización y control de versiones. Los aspectos clave son:
 \begin{itemize}
-    \item \textbf{Project Lead \& Backend Developer:} Diego Díaz Mendaña - Coordinación general y desarrollo core
-    \item \textbf{SIMD Specialist \& Performance Analyst:} Pablo García Pernas - Optimización vectorial
-    \item \textbf{Infrastructure \& Testing Lead:} Mateo Rama García - Setup de entorno y testing
-    \item \textbf{Documentation \& QA Manager:} Fernando Suárez Fernández - Documentación y calidad
+    \item \textbf{Repositorio compartido:} con el código, documentación y recursos del proyecto.
+    \item \textbf{Issue:} cada tarea se define como una \textit{issue} en \textit{GitHub}, con un responsable y un \textit{deadline}.
+    \item \textbf{Project Board:} se emplea un tablero \textit{Kanban} con columnas \textit{To Do}, \textit{In Progress}, \textit{Review} y \textit{Done} para visualizar el estado de las tareas.
+    \item \textbf{Milestones:} cada entrega del proyecto se ha asociado a un \textit{milestone} que agrupa las \textit{issues} correspondientes y medir el progreso.
+    \item \textbf{Pull Requests:} todas las contribuciones se realizan mediante \textit{pull requests} que deben de ser revisadas y aprobadas por, al menos, 3 de los 4 miembros del equipo antes de integrarse en \texttt{main}.
+    \item \textbf{Documentación:} se guarda la documentación en la carpeta \texttt{docs/}.
+\end{itemize}
+\vspace{2ex}
+
+\subsection{Metodología}
+\label{anexo:metodologia}
+El equipo ha adoptado una metodología ágil adaptada al contexto académico del proyecto, inspirada en un enfoque híbrido entre \textit{Scrum} y \textit{Kanban}. Los aspectos clave de esta metodología son:
+\begin{itemize}
+    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) correspondientes a las entregas del proyecto.
+    \item Las tareas se dividen en \textbf{issues} manejables y se priorizan según su importancia y dependencia. Estas tareas son asignadas a los miembros del equipo.
+    \item El \textbf{project board} permite al equipo visualizar el progreso y gestionar las tareas de manera eficiente.
+    \item La revisión colectiva de los \textit{pull requests} fomenta la calidad del código y el aprendizaje compartido.
+    \item Las dependencias entre issues se gestionan mediante etiquetas y referencias cruzadas en \textit{GitHub}.
 \end{itemize}
 
-\subsection{Herramientas de desarrollo colaborativo}
 
-\subsubsection{Control de versiones}
-Se utilizó \textbf{Git} como sistema de control de versiones, con \textbf{GitHub} como plataforma de colaboración. La estrategia de branching siguió un modelo adaptado de Git Flow:
-
-\begin{itemize}
-    \item \texttt{main}: Rama principal con código estable
-    \item \texttt{feature/*}: Ramas para nuevas funcionalidades
-    \item \texttt{docs/*}: Ramas específicas para documentación
-    \item \texttt{infra/*}: Ramas para configuración e infraestructura
-\end{itemize}
-
-\subsubsection{Gestión de tareas}
-Todas las tareas se gestionaron mediante \textbf{GitHub Issues} utilizando plantillas específicas:
-\begin{itemize}
-    \item Plantillas para código, documentación, testing e infraestructura
-    \item Sistema Kanban con GitHub Projects (To Do → In Progress → Review → Done)
-    \item Etiquetado por prioridad, tipo y complejidad
-\end{itemize}
-
-\subsection{Proceso de desarrollo}
-
-\subsubsection{Workflow de código}
-\begin{enumerate}
-    \item Creación de issue con plantilla correspondiente
-    \item Asignación y creación de rama \texttt{feature/nombre-tarea}
-    \item Desarrollo con commits atómicos y descriptivos
-    \item Pull Request con plantilla obligatoria
-    \item Code Review por al menos un compañero
-    \item Merge tras aprobación y tests exitosos
-\end{enumerate}
-
-\subsubsection{Estándares de calidad}
-\begin{itemize}
-    \item \textbf{Code Review obligatorio:} Revisión por pares antes de merge
-    \item \textbf{Testing sistemático:} Tests unitarios y de rendimiento
-    \item \textbf{Documentación continua:} Actualización en cada cambio
-    \item \textbf{Convenciones de código:} Estilo consistente y comentarios descriptivos
-\end{itemize}
-
-\section{Configuración del entorno de desarrollo}
-\label{anexo:setup}
-
-\subsection{Especificaciones de la máquina virtual}
-
-El desarrollo se realizó en una máquina virtual con las siguientes características:
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Componente} & \textbf{Especificación} \\
-\hline
-Sistema Operativo & Ubuntu Desktop 18.04.3 LTS \\
-Usuario & student \\
-Contraseña & teamwork \\
-CPU & Máximo núcleos disponibles (mín. 2) \\
-RAM & Mínimo 3 GiB \\
-Almacenamiento & 20+ GB libres \\
-\hline
-\end{tabular}
-\caption{Especificaciones de la VM de desarrollo}
-\end{table}
-
-\subsection{Software preinstalado}
-
-\begin{itemize}
-    \item \texttt{build-essential}: Herramientas de compilación (GCC, make, etc.)
-    \item \texttt{git}: Control de versiones
-    \item \texttt{cimg-dev}: Librería CImg para procesamiento de imágenes
-    \item \texttt{openssh-server}: Servidor SSH para acceso remoto
-    \item \textbf{Visual Studio Code} con extensiones C/C++ y TODO Highlight
-\end{itemize}
-
-\subsection{Configuración adicional}
-
-\subsubsection{Guest Additions}
-Instalación de VirtualBox Guest Additions para mejor integración:
-\begin{lstlisting}[style=cppStyle]
-sudo sh /media/$USER/VBox*/VBoxLinuxAdditions.run
-sudo reboot
-\end{lstlisting}
-
-\subsubsection{Variables de entorno}
-\begin{lstlisting}[style=cppStyle]
-export PROJECT_ROOT="$HOME/Desktop/teamwork-ac-2025"
-export IMAGES_PATH="$HOME/images"
-export CC=gcc
-export CFLAGS="-Wall -Wextra -std=c99"
-\end{lstlisting}
-
-\section{Dataset de imágenes y recursos}
-\label{anexo:dataset}
-
-\subsection{Estructura del dataset}
-
-El dataset oficial proporcionado para el proyecto se organizó en las siguientes categorías:
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|p{8cm}|}
-\hline
-\textbf{Directorio} & \textbf{Descripción} \\
-\hline
-\texttt{normal/} & Imágenes con exposición correcta para testing básico \\
-\texttt{contrast/} & Imágenes con alteración de contraste para casos extremos \\
-\texttt{whitebalance/} & Imágenes con alteración de balance de blancos \\
-\texttt{backgrounds/} & Fondos degradados para pruebas de fusión \\
-\hline
-\end{tabular}
-\caption{Estructura del dataset de imágenes}
-\end{table}
-
-\subsection{Características técnicas}
-
-\begin{itemize}
-    \item \textbf{Formatos soportados:} JPG, PNG, BMP
-    \item \textbf{Resoluciones típicas:} 1920×1080, 1280×720, 800×600
-    \item \textbf{Profundidad de color:} 24-bit RGB
-    \item \textbf{Tamaño total:} Aproximadamente 50MB
-\end{itemize}
-
-\section{Herramientas de análisis y profiling}
-\label{anexo:tools}
-
-\subsection{Herramientas de medición de rendimiento}
-
-\subsubsection{Timing y benchmarking}
-\begin{itemize}
-    \item \textbf{gettimeofday()}: Medición de alta precisión
-    \item \textbf{clock\_gettime()}: Timing monotónico
-    \item \textbf{Scripts personalizados}: Automatización de benchmarks
-\end{itemize}
-
-\subsubsection{Profiling de memoria}
-\begin{itemize}
-    \item \textbf{Valgrind (massif)}: Análisis de uso de memoria
-    \item \textbf{Valgrind (memcheck)}: Detección de memory leaks
-    \item \textbf{/proc/self/status}: Monitoreo en tiempo real
-\end{itemize}
-
-\subsubsection{Análisis de rendimiento del procesador}
-\begin{itemize}
-    \item \textbf{perf stat}: Estadísticas de hardware counters
-    \item \textbf{perf record/report}: Profiling detallado
-    \item \textbf{gprof}: Profiling tradicional de funciones
-\end{itemize}
-
-\subsection{Comandos típicos de análisis}
-
-\begin{lstlisting}[style=cppStyle]
-# Benchmarking básico
-time ./release/programa input.jpg output.jpg
-
-# Análisis con perf
-perf stat -e cycles,instructions,cache-misses ./release/programa
-
-# Memory profiling
-valgrind --tool=massif ./release/programa input.jpg
-
-# CPU profiling
-perf record -g ./release/programa
-perf report
-\end{lstlisting}
-
-\section{Plantillas y estándares de documentación}
-\label{anexo:templates}
-
-\subsection{Plantillas de GitHub}
-
-El proyecto implementó plantillas estandarizadas para mantener consistencia en la documentación:
-
-\subsubsection{Plantilla de Pull Request}
-Incluye secciones para:
-\begin{itemize}
-    \item Descripción detallada de cambios
-    \item Tipo de cambio y criterios de aceptación
-    \item Lista de verificación de calidad
-    \item Evidencias de testing y benchmarking
-    \item Instrucciones para revisores
-\end{itemize}
-
-\subsubsection{Plantillas de Issues}
-\begin{itemize}
-    \item \textbf{Code Task}: Para implementación de algoritmos
-    \item \textbf{Testing Task}: Para análisis de rendimiento y validación
-    \item \textbf{Documentation Task}: Para memoria y documentación técnica
-    \item \textbf{Infrastructure Task}: Para setup y configuración
-    \item \textbf{Bug Report}: Para reporte estructurado de errores
-\end{itemize}
-
-\subsection{Convenciones de código}
-
-\subsubsection{Estilo de código C}
-\begin{itemize}
-    \item \textbf{Estándar}: C99
-    \item \textbf{Indentación}: 4 espacios
-    \item \textbf{Nomenclatura}: snake\_case para funciones y variables
-    \item \textbf{Comentarios}: Descriptivos para lógica compleja
-\end{itemize}
-
-\subsubsection{Convenciones de commits}
-Seguimiento de Conventional Commits:
-\begin{lstlisting}[style=cppStyle]
-feat(filtros): implementar filtro de mediana
-fix(memory): corregir memory leak en liberación
-docs(readme): actualizar guía de instalación
-perf(simd): optimizar bucle principal con AVX2
-\end{lstlisting}
-
-\section{Métricas y KPIs del proyecto}
-\label{anexo:metrics}
-
-\subsection{Métricas de desarrollo}
-
-El proyecto estableció métricas específicas para evaluar el progreso y la calidad:
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Métrica} & \textbf{Objetivo} & \textbf{Resultado} \\
-\hline
-Code Coverage & > 80\% & [Por completar] \\
-PR Review Time & < 24h & [Por completar] \\
-Issue Resolution & < 3 días & [Por completar] \\
-Build Success Rate & > 95\% & [Por completar] \\
-\hline
-\end{tabular}
-\caption{KPIs de calidad del desarrollo}
-\end{table}
-
-\subsection{Métricas de rendimiento objetivo}
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|l|l|l|}
-\hline
-\textbf{Versión} & \textbf{Tiempo objetivo} & \textbf{Speedup} & \textbf{Memoria} \\
-\hline
-Monohilo & 10-15s & 1.0× (baseline) & < 512MB \\
-SIMD & 3-5s & 3-4× & < 512MB \\
-Multihilo & 2-4s & 4-8× & < 1GB \\
-\hline
-\end{tabular}
-\caption{Objetivos de rendimiento por fase}
-\end{table}
-
-\section{Referencias técnicas y bibliografía}
-\label{anexo:referencias}
-
-\subsection{Documentación oficial}
-\begin{itemize}
-    \item Intel Intrinsics Guide: \url{https://software.intel.com/sites/landingpage/IntrinsicsGuide/}
-    \item CImg Library Documentation: \url{http://cimg.eu/}
-    \item GNU Make Manual: \url{https://www.gnu.org/software/make/manual/}
-\end{itemize}
-
-\subsection{Recursos de optimización}
-\begin{itemize}
-    \item Tommesani, T. ``MMX and SSE Primer'': \url{https://www.tommesani.com/MMXPrimer.html}
-    \item CodeProject. ``Crunching Numbers with AVX and AVX2'': \url{https://www.codeproject.com/Articles/874396/Crunching-Numbers-with-AVX-and-AVX}
-    \item Finis, J. ``x86 Intrinsics Cheat Sheet v2.2'': \url{https://db.in.tum.de/~finis/x86-intrin-cheatsheet-v2.2.pdf}
-\end{itemize}
-
-\subsection{Herramientas de desarrollo}
-\begin{itemize}
-    \item Valgrind User Manual: \url{http://valgrind.org/docs/manual/}
-    \item Linux perf Wiki: \url{https://perf.wiki.kernel.org/}
-    \item GDB User Manual: \url{https://www.gnu.org/software/gdb/documentation/}
-\end{itemize}
-
-\newpage
 
 \end{document}
