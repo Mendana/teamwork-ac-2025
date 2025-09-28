@@ -6,7 +6,13 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 #include <CImg.h>
+
+#define R_WEIGHT 0.3
+#define G_WEIGHT 0.59
+#define B_WEIGHT 0.11
+#define MAX_BRIGHTNESS 255.0
 
 using namespace cimg_library;
 
@@ -64,6 +70,8 @@ int main() {
 	 *   - Prepare variables for the algorithm
 	 *   - This is not included in the benchmark time
 	 */
+	struct timespec tStart, tEnd; // Variables for time measurement
+	double elapsedTime;     // Elapsed time in seconds
 
 	srcImage.display(); // Displays the source image
 	uint width = srcImage.width();// Getting information from the source image
@@ -99,6 +107,7 @@ int main() {
 	 * TODO: Algorithm start.
 	 *   - Measure initial time
 	 */
+	clock_gettime(CLOCK_REALTIME, &tStart); // Initial time
 
 
 	/************************************************
@@ -112,6 +121,9 @@ int main() {
 	 *   - Measure the end time
 	 *   - Calculate the elapsed time
 	 */
+	clock_gettime(CLOCK_REALTIME, &tEnd); // End time
+	elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
+	printf("Elapsed time: %.6f seconds\n", elapsedTime);
 
 		
 	// Create a new image object with the calculated pixels
