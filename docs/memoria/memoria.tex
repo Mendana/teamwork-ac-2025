@@ -221,14 +221,61 @@ breakable = true
 \newpage
 
 \section{Introducción}
-La presente memoria tiene por objetivo documentar de manera exhaustiva el desarrollo de la Fase II del trabajo práctico correspondiente a la asignatura \textbf{Fundamentos de Computadores y Redes}. El propósito fundamental de esta fase consiste en profundizar en los conceptos generales abordados previamente en los laboratorios de la materia, aplicándolos en un contexto de análisis práctico. \vspace{2ex}
+Esta memoria recoge el desarrollo del proyecto de la asignatura \textit{Arquitectura de Computadores}, impartida en el curso 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El proyecto tiene como objetivo aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Además, se ha de analizar el rendimiento del filtro y compararlo con las implementaciones monohilo y multihilo.\vspace{2ex}
 
-\noindent En particular, la práctica propuesta requiere llevar a cabo el análisis detallado del código fuente de un programa, utilizando para ello las herramientas de depuración que proporciona el entorno de desarrollo \textbf{Visual Studio}. A través de este análisis, se pretende identificar las palabras clave necesarias para la desactivación de una ``bomba binaria''. Como actividad final, se procederá a modificar el código de manera que la bomba no explote independientemente de las entradas proporcionadas por el usuario. \vspace{2ex}
-
+\noindent El trabajo se ha estructurado en varias fases progresivas:
+\begin{itemize}
+    \item \textbf{Entrega 1 (Monohilo):} Implementación básica del filtro de imágenes en un solo hilo.
+    \item \textbf{Entrega 2 (SIMD y Multihilo):} Optimización del filtro utilizando instrucciones SIMD y paralelización con múltiples hilos.
+\end{itemize}
 \vspace{3ex}
 
-\section{Desarrollo del análisis de las palabras clave}
+\section{Desarrollo del Proyecto}
+....
+\vspace{3ex}
 
-El programa objeto de análisis ha sido suministrado por el profesor de la asignatura y se encuentra ubicado en la carpeta denominada \textit{bomba} de este repositorio, concretamente en el archivo ejecutable \texttt{main.exe}. Este ejecutable, diseñado para el sistema operativo Windows, solicita durante su ejecución una serie de entradas por parte del usuario. En caso de que dichas entradas sean correctas, el programa continúa su ejecución sin incidentes, en caso contrario, la ``bomba'' programada explota (la demostración de este comportamiento queda fuera del alcance de la presente memoria). \vspace{2ex}
+\section{Resultados y Análisis}
+....
+\vspace{3ex}
+
+\section{Conclusiones}
+....
+\vspace{3ex}
+
+\newpage
+
+% ================================
+% ANEXOS
+% ================================
+
+\part*{ANEXOS}
+
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+
+\section{Flujo de trabajo y metodología de desarrollo}
+Todo el desarrollo del proyecto se puede seguir en el repositorio de \textit{GitHub}: \href{https://www.github.com/Mendana/teamwork-ac-2025}{ver repositorio}. Para la gestión del proyecto y poder garantizar un desarrollo colaborativo, se ha establecido un flujo de trabajo común basado en \textit{Git} y \textit{GitHub} como herramientas centrales de organización y control de versiones. Los aspectos clave son:
+\begin{itemize}
+    \item \textbf{Repositorio compartido:} con el código, documentación y recursos del proyecto.
+    \item \textbf{Issue:} cada tarea se define como una \textit{issue} en \textit{GitHub}, con un responsable y un \textit{deadline}.
+    \item \textbf{Project Board:} se emplea un tablero \textit{Kanban} con columnas \textit{To Do}, \textit{In Progress}, \textit{Review} y \textit{Done} para visualizar el estado de las tareas.
+    \item \textbf{Milestones:} cada entrega del proyecto se ha asociado a un \textit{milestone} que agrupa las \textit{issues} correspondientes a dicha fase.
+    \item \textbf{Pull Requests:} todas las contribuciones se realizan mediante \textit{pull requests} que deben ser revisadas y aprobadas por, al menos, 3 de los 4 miembros del equipo antes de integrarse en \texttt{main}.
+    \item \textbf{Documentación:} se guarda la documentación en la carpeta \texttt{docs/}.
+\end{itemize}
+\vspace{2ex}
+
+\subsection{Metodología}
+\label{anexo:metodologia}
+El equipo ha adoptado una metodología ágil adaptada al contexto académico del proyecto, inspirada en un enfoque híbrido entre \textit{Scrum} y \textit{Kanban}. Los aspectos clave de esta metodología son:
+\begin{itemize}
+    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) correspondientes a las entregas del proyecto.
+    \item Las tareas se dividen en \textbf{issues} manejables y se priorizan según su importancia y dependencia. Estas tareas son asignadas a los miembros del equipo.
+    \item El \textbf{project board} permite al equipo visualizar el progreso y gestionar las tareas de manera eficiente.
+    \item La revisión colectiva de los \textit{pull requests} fomenta la calidad del código y el aprendizaje compartido.
+    \item Las dependencias entre issues se gestionan mediante etiquetas y referencias cruzadas en \textit{GitHub}.
+\end{itemize}
+
+
 
 \end{document}
