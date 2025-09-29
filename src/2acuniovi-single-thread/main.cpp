@@ -14,6 +14,9 @@
 #define B_WEIGHT 0.11
 #define MAX_BRIGHTNESS 255.0
 
+//Number of iterations of the filter so it reaches the required time
+#define N_ITERATIONS 60
+
 using namespace cimg_library;
 
 // Data type for image components
@@ -115,7 +118,9 @@ int main() {
 	/************************************************
 	 * Algorithm.
 	 */
-	filter(filter_args);
+	for (int i = 0; i < N_ITERATIONS; i++){
+		filter(filter_args);
+	}
 
 
 	/***********************************************
@@ -124,7 +129,7 @@ int main() {
 	 */
 	clock_gettime(CLOCK_REALTIME, &tEnd); // End time
 	elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
-	printf("Elapsed time: %.6f seconds\n", elapsedTime);
+	printf("Elapsed time (%d repetitions): %.6f seconds\n", N_ITERATIONS, elapsedTime);
 
 		
 	// Create a new image object with the calculated pixels
