@@ -36,25 +36,30 @@ typedef struct {
 
 /***********************************************
  * 
- * Algorithm. Image filter.
- * In this example, the algorithm is a components swap
- *
- * TO BE REPLACED BY YOUR ALGORITHM
+ * Algorithm. B&W inversion (#3).
+ * 
+ * Formula:
+ * 
+ * Para cada i = 0,...,pixelCount:
+ * 1) Convertir a B&W
+ * 	L(i) = 0.3 R(i) + 0.59 G(i) + 0.11 B(i)
+ * 
+ * 2) Invertir
+ * 	L(i) = 255 - L(i)
  * 		
  * *********************************************/
 void filter (filter_args_t args) {
-	/************************************************
-	 * FIXME: Algorithm.
-	 * In this example, the algorithm is a components swap
-	 *
-	 * TO BE REPLACED BY YOUR ALGORITHM
-	 */
     for (uint i = 0; i < args.pixelCount; i++) {
-		*(args.pRdst + i) = *(args.pGsrc + i);  // This is equals to pRdest[i] = pGsrc[i]
-		*(args.pGdst + i) = *(args.pBsrc + i);
-		*(args.pBdst + i) = *(args.pRsrc + i);
-	}
+		data_t L = *(args.pRsrc + i) * R_WEIGHT + 
+				*(args.pGsrc + i) * G_WEIGHT + 
+				*(args.pBsrc + i) * B_WEIGHT;
+		
+		L = MAX_BRIGHTNESS - L;
 
+		*(args.pRdst + i) = L;
+		*(args.pGdst + i) = L;
+		*(args.pBdst + i) = L;
+	}
 }
 
 int main() {
