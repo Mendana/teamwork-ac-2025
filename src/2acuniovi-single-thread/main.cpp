@@ -17,7 +17,6 @@
 using namespace cimg_library;
 
 // Data type for image components
-// FIXME: Change this type according to your group assignment
 typedef float data_t;
 
 const char* SOURCE_IMG      = "bailarina.bmp";
@@ -71,7 +70,6 @@ int main() {
 
 
 	/***************************************************
-	 * TODO: Variables initialization.
 	 *   - Prepare variables for the algorithm
 	 *   - This is not included in the benchmark time
 	 */
@@ -109,7 +107,6 @@ int main() {
 
 
 	/***********************************************
-	 * TODO: Algorithm start.
 	 *   - Measure initial time
 	 */
 	clock_gettime(CLOCK_REALTIME, &tStart); // Initial time
@@ -122,7 +119,6 @@ int main() {
 
 
 	/***********************************************
-	 * TODO: End of the algorithm.
 	 *   - Measure the end time
 	 *   - Calculate the elapsed time
 	 */
