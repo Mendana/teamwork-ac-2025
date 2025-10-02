@@ -20,7 +20,7 @@
 using namespace cimg_library;
 
 // Data type for image components
-typedef float data_t;
+typedef double data_t;
 
 const char* SOURCE_IMG      = "bailarina.bmp";
 const char* DESTINATION_IMG = "bailarina2.bmp";
@@ -35,6 +35,21 @@ typedef struct {
 	data_t *pBdst;
 	uint pixelCount; // Size of the image in pixels
 } filter_args_t;
+
+/**
+ * Load image for the algorithm
+ * 
+ * Retorna la imagen si existe y si no lanza excepción y finaliza el programa
+ */
+CImg<data_t> load_image(const char* filename) {
+    if (access(filename, F_OK) == -1) {
+        fprintf(stderr, "Error: la imagen '%s' no existe.\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    CImg<data_t> image(filename);  // Carga con CImg
+    return image; // Se devuelve por valor, usando el constructor de copia o move
+}
 
 /***********************************************
  * 
@@ -65,8 +80,8 @@ void filter (filter_args_t args) {
 }
 
 int main() {
-	// Open file and object initialization
-	CImg<data_t> srcImage(SOURCE_IMG);
+	// Cargar imagen fuente
+    CImg<data_t> srcImage = load_image(SOURCE_IMG);
 
 	filter_args_t filter_args;
 	data_t *pDstImage; // Pointer to the new image pixels
@@ -112,7 +127,10 @@ int main() {
 	/***********************************************
 	 *   - Measure initial time
 	 */
-	clock_gettime(CLOCK_REALTIME, &tStart); // Initial time
+	if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
+		printf("Error al obtener el tiempo inicial");
+		exit(EXIT_FAILURE);
+	}
 
 
 	/************************************************
@@ -127,7 +145,10 @@ int main() {
 	 *   - Measure the end time
 	 *   - Calculate the elapsed time
 	 */
-	clock_gettime(CLOCK_REALTIME, &tEnd); // End time
+	if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
+		printf("Error al obtener el tiempo final");
+		exit(EXIT_FAILURE);
+	}
 	elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
 	printf("Elapsed time (%d repetitions): %.6f seconds\n", N_ITERATIONS, elapsedTime);
 
@@ -136,6 +157,14 @@ int main() {
 	// In case of normal color images use nComp=3,
 	// In case of B/W images use nComp=1.
 	CImg<data_t> dstImage(pDstImage, width, height, 1, nComp);
+
+	if (static_cast<unsigned int>(dstImage.width()) != width || 
+		static_cast<unsigned int>(dstImage.height()) != height || 
+		static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
+		fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
+		free(pDstImage);
+		exit(EXIT_FAILURE);
+	}
 
 	// Store destination image in disk
 	dstImage.save(DESTINATION_IMG); 
