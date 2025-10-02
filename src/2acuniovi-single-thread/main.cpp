@@ -127,7 +127,10 @@ int main() {
 	/***********************************************
 	 *   - Measure initial time
 	 */
-	clock_gettime(CLOCK_REALTIME, &tStart); // Initial time
+	if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
+		printf("Error al obtener el tiempo inicial");
+		exit(EXIT_FAILURE);
+	}
 
 
 	/************************************************
@@ -142,7 +145,10 @@ int main() {
 	 *   - Measure the end time
 	 *   - Calculate the elapsed time
 	 */
-	clock_gettime(CLOCK_REALTIME, &tEnd); // End time
+	if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
+		printf("Error al obtener el tiempo final");
+		exit(EXIT_FAILURE);
+	}
 	elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
 	printf("Elapsed time (%d repetitions): %.6f seconds\n", N_ITERATIONS, elapsedTime);
 
