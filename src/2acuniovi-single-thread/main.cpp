@@ -158,7 +158,9 @@ int main() {
 	// In case of B/W images use nComp=1.
 	CImg<data_t> dstImage(pDstImage, width, height, 1, nComp);
 
-	if (dstImage.width() != width || dstImage.height() != height || dstImage.spectrum() != nComp) {
+	if (static_cast<unsigned int>(dstImage.width()) != width || 
+		static_cast<unsigned int>(dstImage.height()) != height || 
+		static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
 		fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
 		free(pDstImage);
 		exit(EXIT_FAILURE);
