@@ -1,0 +1,11 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción}{2}{section.1}%
+\contentsline {section}{\numberline {2}Desarrollo del algoritmo}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Comprobaciones e inicialización}{2}{subsection.2.1}%
+\contentsline {section}{\numberline {3}Desarrollo del Proyecto}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Fase 1: Implementación Monohilo}{3}{subsection.3.1}%
+\contentsline {section}{\numberline {4}Resultados y Análisis}{3}{section.4}%
+\contentsline {section}{\numberline {5}Conclusiones}{3}{section.5}%
+\contentsline {part}{ANEXOS}{4}{section.5}%
+\contentsline {section}{\numberline {A}Flujo de trabajo y metodología de desarrollo}{4}{appendix.Alph1}%
+\contentsline {subsection}{\numberline {A.1}Metodología}{4}{subsection.Alph1.1}%
