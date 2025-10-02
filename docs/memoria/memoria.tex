@@ -61,28 +61,53 @@
         {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
         {ñ}{{\~n}}1 {Ñ}{{\~N}}1
 }
-% Estilo para C++
+% Estilo para C++ moderno
 \lstdefinestyle{cppStyle}{
     language=C++,
     inputencoding=utf8,
-    basicstyle=\ttfamily\footnotesize,
-    stringstyle=\ttfamily\color{verdeSuave},
-    commentstyle=\ttfamily\itshape\color{gray},
-    keywordstyle=\color{blue}\bfseries,
+    basicstyle=\ttfamily\small\color{negro},
+    stringstyle=\ttfamily\color{verdeSuave}\bfseries,
+    commentstyle=\ttfamily\itshape\color{gray!70},
+    keywordstyle=\color{azulSuave}\bfseries,
+    numberstyle=\tiny\color{gray!60}\sffamily,
+    directivestyle=\color{magenta}\bfseries,
+    emph={std, cout, cin, endl, vector, string, size_t, uint, int, double, float, bool, char, void, const, auto, nullptr},
+    emphstyle=\color{naranjaSuave}\bfseries,
+    emph={[2]filter, filter_args_t, data_t, R_WEIGHT, G_WEIGHT, B_WEIGHT, MAX_BRIGHTNESS},
+    emphstyle={[2]\color{dorado}\bfseries},
     numbers=left,
-    numberstyle=\tiny\color{gray},
-    xleftmargin=10pt,
-    frame=trBl,
+    numbersep=12pt,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    frame=single,
     frameround=tttt,
-    backgroundcolor=\color{gray!20},
+    framerule=0.8pt,
+    rulecolor=\color{azulSuave!30},
+    backgroundcolor=\color{grisSuave!25},
+    fillcolor=\color{grisSuave!15},
     breaklines=true,
+    breakatwhitespace=true,
+    breakindent=20pt,
+    postbreak=\mbox{\textcolor{azulSuave}{$\hookrightarrow$}\space},
     extendedchars=true,    
     autogobble=true,
     tabsize=4,
+    showstringspaces=false,
+    captionpos=b,
+    aboveskip=15pt,
+    belowskip=10pt,
+    lineskip=1pt,
     literate=%
         {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
         {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
         {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+        {->}{{\textcolor{azulSuave}{$\rightarrow$}}}1
+        {<-}{{\textcolor{azulSuave}{$\leftarrow$}}}1
+        {<=}{{\textcolor{azulSuave}{$\leq$}}}1
+        {>=}{{\textcolor{azulSuave}{$\geq$}}}1
+        {!=}{{\textcolor{azulSuave}{$\neq$}}}1
+        {++}{{\textcolor{naranjaSuave}{++}}}1
+        {--}{{\textcolor{naranjaSuave}{--}}}1
 }
 
 
@@ -197,7 +222,7 @@ breakable = true
         
         \text{Díaz Mendaña, Diego - UO301887}\\[0.15cm]
         \text{García Pernas, Pablo - UO300167}\\[0.15cm]
-        \text{Rama García, Mateo - UO}\\[0.15cm]
+        \text{Rama García, Mateo - UO300710}\\[0.15cm]
         \text{Suárez Fernández, Fernando - UO300028}
         
         \vfill
@@ -230,8 +255,60 @@ Esta memoria recoge el desarrollo del proyecto de la asignatura \textit{Arquitec
 \end{itemize}
 \vspace{3ex}
 
+\section{Desarrollo del algoritmo}
+Se ha desarrollado el algoritmo de inversión de blanco y negro (Algoritmo número \(\#3)\). Para 
+desarrollar el código hemos usado la máquina virtual brindada por los profesores, así como
+la plantilla dada por los profesores de la asignatura.
+\vspace{2ex}
+
+Dentro de esta plantilla ya nos venían incluidas las líneas de código 
+con los que obteníamos tanto el número de pixeles como los punteros 
+a los arrays RGB de la imagen destino y salida.
+Es por ello que nosotros únicamente hemos implementado las comprobaciones y el algoritmo.
+\vspace{2ex}
+
+\subsection{Comprobaciones e inicialización}
+Antes de implimentar el algoritmo, se debe realizar 
+las comprobaciones necesarias para 
+
+Para desarrollar la función filter nos ayudamos de la formúla 
+que había en las diapositivas. Esta función lo que hace 
+es para cada pixel de la imagen debe multiplicar cada componente de 
+cada pixel de la 
+imagen por su correspondiente peso. Estos son los siguientes:
+\begin{enumerate}
+    \item Componente roja: Esta ha de ser multiplicada por \(0.3\)
+    \item Componente verde: Esta ha de ser multiplicada por \(0.59\)
+    \item Componente azul: Esta ha de ser multiplicada por \(0.11\)
+\end{enumerate}
+Por último, lo que hay que 
+hacer es restar el valor obtenido a \(255\) (valor máximo de brillo)
+y asignar este valor a las tres componentes del pixel de la imagen.
+\vspace{2ex}
+
+Como esto tiene que hacerse para cada pixel, realizamos un bucle 
+que recorre todos los pixeles de la imagen. 
+
+
+\begin{lstlisting}
+    void filter (filter_args_t args) {
+    for (uint i = 0; i < args.pixelCount; i++) {
+		data_t L = *(args.pRsrc + i) * R_WEIGHT + 
+				*(args.pGsrc + i) * G_WEIGHT + 
+				*(args.pBsrc + i) * B_WEIGHT;
+		
+		L = MAX_BRIGHTNESS - L;
+
+		*(args.pRdst + i) = L;
+		*(args.pGdst + i) = L;
+		*(args.pBdst + i) = L;
+	}
+}
+\end{lstlisting}
 \section{Desarrollo del Proyecto}
-....
+\subsection{Fase 1: Implementación Monohilo}
+Para la primera fase del proyecto, se ha desarrollado un 
+algoritmo de 
 \vspace{3ex}
 
 \section{Resultados y Análisis}
