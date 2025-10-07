@@ -1,127 +1,119 @@
 \documentclass[11pt,a4paper]{article}
 
+% Paquetes de fuentes (deben ir primero para XeLaTeX)
+\usepackage{fontspec}
+\newfontfamily\myfont{Consolas}
+
+% Paquetes de idioma y matemáticas
 \usepackage[spanish]{babel}
 \usepackage{amsmath,amsfonts, amssymb, mathtools} % Podemos añadir amssymb, amsthm o bm
+
+% Paquetes de diseño y gráficos
 \usepackage{graphicx, xparse}
 \usepackage[top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry} % Este paquete permite modificar los márgenes del documento
-\usepackage[colorlinks=true, allcolors=blue]{hyperref} % Se indica que los hipervínculos van todos en azul
 \usepackage{setspace}
 \usepackage{xcolor, tcolorbox, booktabs, multirow, colortbl}
 \usepackage{cancel} %tachar cosas
 \tcbuselibrary{breakable}
-\usepackage{hyperref}
 \usepackage{titlesec}
 \usepackage{array}
-\usepackage{tikz}
-\usetikzlibrary{positioning,shapes.geometric,fit,backgrounds}
-\usepackage{listings, lstautogobble}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{fontspec}
 \usepackage{makecell}
 \usepackage{nicematrix}
 
-\newfontfamily\myfont{Consolas}
+% Paquetes de tikz y gráficos
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.geometric,fit,backgrounds}
+
+% Paquetes de código
+\usepackage{listings, lstautogobble}
+
+% Hyperref debe ir al final (excepto algunos paquetes específicos)
+\usepackage[colorlinks=true, allcolors=blue]{hyperref} % Se indica que los hipervínculos van todos en azul
 
 \graphicspath{ {images/}}
 
 
+% Colores modernos para HTML
+\definecolor{CppBackground}{RGB}{248, 248, 248}    % Fondo gris muy claro
+\definecolor{CppBorder}{RGB}{220, 220, 220}        % Borde gris
+\definecolor{CppTags}{RGB}{0, 119, 170}            % Azul medio para etiquetas
+\definecolor{CppAttributes}{RGB}{165, 42, 42}      % Marrón oscuro para atributos
+\definecolor{CppValues}{RGB}{0, 128, 0}            % Verde para valores
+\definecolor{CppStrings}{RGB}{34, 139, 34}         % Verde oscuro para strings
+\definecolor{CppComments}{RGB}{128, 128, 128}      % Gris para comentarios
+\definecolor{CppLineNumbers}{RGB}{160, 160, 160}   % Gris para números de línea
 
-% Definir lenguaje MiAssembly
-\lstdefinelanguage{MiAssembly}{
-    keywords={MOV, ADD, SUB, STR, LDR, JMP, CALL, RET, PUSH, POP, MOVL, MOVH, AND, OR, XOR, INC, DEC, NOT, NEG, CMP, JMP, BRC, BRNC, BRO, BRNO, BRZ, BRNZ, BRS, BRNS, JGE, LEA, JNE, JE, MOVSX, SHL, IMUL}, % Instrucciones de ensamblador
-    keywordstyle=\color{blue}\bfseries,
-    morekeywords=[2]{r0, r1, r2, r3, r4, r5, r6, r7, SP, PC}, % Registros
-    keywordstyle=[2]\color{purple}\bfseries,
-    morecomment=[l]{;}, % Comentarios con ;
-    commentstyle=\color{gray}\itshape,
-    morestring=[b]", % Cadenas entre comillas dobles
-    stringstyle=\color{verdeSuave},
-    sensitive=true, % Diferencia entre mayúsculas y minúsculas
+% Definición mejorada de HTML como lenguaje
+\lstdefinelanguage{CPP}{
+  sensitive=true,
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]',
+  alsoletter={=},
+  alsodigit={-},
+  % Palabras clave en dos grupos - etiquetas y atributos
+  morekeywords=[1]{
+    auto,break,case,char,const,continue,default,do,double,else,
+    enum,extern,float,for,goto,if,int,long,register,return,
+    short,signed,sizeof,static,struct,switch,typedef,union,
+    unsigned,void,volatile,while,class,private,protected,
+    public,this,using,namespace,new,delete,true,false,nullptr,
+    template,typename,typeid,constexpr,const_cast,dynamic_cast,
+    explicit,friend,inline,mutable,nolint,reinterpret_cast,
+    static_cast,virtual
+  },
+  morekeywords=[2]{
+    int,float,double,char,void,bool,true,false,nullptr,size_t,uint8_t,uint16_t,uint32_t,uint64_t
+  }
 }
 
-% Estilo para Assembly
-\lstdefinestyle{assemblyStyle}{
-    language=MiAssembly,
-    inputencoding=utf8,
-    basicstyle=\ttfamily\footnotesize,
-    stringstyle=\ttfamily\color{verdeSuave},
-    commentstyle=\ttfamily\itshape\color{gray},
-    keywordstyle=\color{blue}\bfseries,
-    numbers=left,
-    numberstyle=\tiny\color{gray},
-    xleftmargin=10pt,
-    frame=shadowbox,
-    breaklines=true,
-    extendedchars=true,    
-    autogobble=true,
-    tabsize=4,
-    literate=%
-        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
-        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
-        {ñ}{{\~n}}1 {Ñ}{{\~N}}1
-}
-% Estilo para C++ moderno
+% Configuración avanzada y estética para HTML - ESTILO MODERNO
 \lstdefinestyle{cppStyle}{
-    language=C++,
-    inputencoding=utf8,
-    basicstyle=\ttfamily\small\color{negro},
-    stringstyle=\ttfamily\color{verdeSuave}\bfseries,
-    commentstyle=\ttfamily\itshape\color{gray!70},
-    keywordstyle=\color{azulSuave}\bfseries,
-    numberstyle=\tiny\color{gray!60}\sffamily,
-    directivestyle=\color{magenta}\bfseries,
-    emph={std, cout, cin, endl, vector, string, size_t, uint, int, double, float, bool, char, void, const, auto, nullptr},
-    emphstyle=\color{naranjaSuave}\bfseries,
-    emph={[2]filter, filter_args_t, data_t, R_WEIGHT, G_WEIGHT, B_WEIGHT, MAX_BRIGHTNESS},
-    emphstyle={[2]\color{dorado}\bfseries},
-    numbers=left,
-    numbersep=12pt,
-    xleftmargin=15pt,
-    xrightmargin=5pt,
-    frame=single,
-    frameround=tttt,
-    framerule=0.8pt,
-    rulecolor=\color{azulSuave!30},
-    backgroundcolor=\color{grisSuave!25},
-    fillcolor=\color{grisSuave!15},
-    breaklines=true,
-    breakatwhitespace=true,
-    breakindent=20pt,
-    postbreak=\mbox{\textcolor{azulSuave}{$\hookrightarrow$}\space},
-    extendedchars=true,    
-    autogobble=true,
-    tabsize=4,
-    showstringspaces=false,
-    captionpos=b,
-    aboveskip=15pt,
-    belowskip=10pt,
-    lineskip=1pt,
-    literate=%
-        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
-        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
-        {ñ}{{\~n}}1 {Ñ}{{\~N}}1
-        {->}{{\textcolor{azulSuave}{$\rightarrow$}}}1
-        {<-}{{\textcolor{azulSuave}{$\leftarrow$}}}1
-        {<=}{{\textcolor{azulSuave}{$\leq$}}}1
-        {>=}{{\textcolor{azulSuave}{$\geq$}}}1
-        {!=}{{\textcolor{azulSuave}{$\neq$}}}1
-        {++}{{\textcolor{naranjaSuave}{++}}}1
-        {--}{{\textcolor{naranjaSuave}{--}}}1
+  language=CPP,
+  backgroundcolor=\color{CppBackground},
+  basicstyle=\ttfamily\footnotesize,
+  % Estilo de las etiquetas y atributos
+  keywordstyle=[1]{\color{CppTags}\bfseries},         % Etiquetas Cpp
+  keywordstyle=[2]{\color{CppAttributes}},            % Atributos Cpp
+  stringstyle=\color{CppStrings},                     % Valores de atributos entre comillas
+  commentstyle=\color{CppComments}\itshape,           % Comentarios
+  % Colorear etiquetas completas incluyendo < y >
+  literate=
+    {<}{\textcolor{CppTags}{\textbf{<}}}{1}
+    {>}{\textcolor{CppTags}{\textbf{>}}}{1}
+    {/}{\textcolor{CppTags}{\textbf{/}}}{1}
+    {=}{\textcolor{CppAttributes}{\textbf{=}}}{1},
+  % Colores para atributos y valores
+  moredelim=**[s][\color{CppAttributes}]{\ }{=},      % Atributos
+  % Configuración de presentación
+  breaklines=true,                                     % Romper líneas largas
+  breakatwhitespace=true,                              % Romper en espacios
+  columns=fullflexible,                                % Espaciado flexible
+  showspaces=false,                                    % No mostrar espacios
+  showstringspaces=false,                              % No mostrar espacios en strings
+  showtabs=false,                                      % No mostrar tabulaciones
+  tabsize=2,                                           % Tamaño de tabulación
+  aboveskip=3pt,                                       % Más espacio vertical (moderno)
+  belowskip=3pt,                                       % Más espacio vertical (moderno)
+  % Estilo de marco MODERNO Y LIMPIO - LÍNEA SUPERIOR E INFERIOR
+  frame=topline,                                       % Solo líneas superior e inferior (minimalista)
+  framesep=8pt,                                        % Más separación (breathing room)
+  framerule=1.5pt,                                     % Línea de grosor medio
+  rulecolor=\color{CppBorder},                        % Color del marco
+  xleftmargin=10pt,                                    % Margen equilibrado
+  xrightmargin=0pt,                                    % Sin margen derecho (limpio)
+  numbers=left,                                        % Números a la izquierda para Cpp
+  numberstyle=\tiny\color{CppLineNumbers}\sffamily,   % Fuente sans-serif moderna
+  numbersep=15pt,                                      % Más separación de números (aire)
+  % Etiqueta identificativa moderna con fondo sutil
+  title={\footnotesize\colorbox{CppBackground!50}{\textcolor{CppTags}{}}},
+  % Soporte para caracteres especiales en español
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+           {ñ}{{\~n}}1 {Ñ}{{\~N}}1,
+  emph={doctype,lang,href,class,id},
+  emphstyle={\color{CppAttributes}\bfseries}
 }
-
-
-
-
-%Colores
-\definecolor{blanco}{HTML}{FFFFFF}
-\definecolor{negro}{HTML}{000000}
-\definecolor{azulSuave}{HTML}{6ac9d5}
-\definecolor{naranjaSuave}{HTML}{d5956a}
-\definecolor{verdeSuave}{HTML}{6ad578}
-\definecolor{verdeHoja}{HTML}{006400}
-\definecolor{naranjaDuro}{HTML}{bd2d0e}
-
 
 
 \titleformat{\part}[display]
@@ -129,70 +121,6 @@
   {}           % Prefijo antes del título de la parte
   {20pt}                      % Separación entre "Parte I" y el título
   {\Huge}                     % Estilo del título de la parte
-
-
-
-%Colores
-\definecolor{blanco}{HTML}{FFFFFF}
-\definecolor{negro}{HTML}{000000}
-\definecolor{azulSuave}{HTML}{6ac9d5}
-\definecolor{naranjaSuave}{HTML}{d5956a}
-\definecolor{verdeSuave}{HTML}{6ad578}
-\definecolor{magenta}{HTML}{FF00FF}
-\definecolor{dorado}{HTML}{ad8a1f}
-\definecolor{amarilloPastel}{RGB}{255, 249, 196} % Amarillo pastel claro
-\definecolor{amarilloOscuro}{RGB}{253, 216, 100}  % Amarillo más oscuro
-\definecolor{grisSuave}{RGB}{230, 230, 230}      % Gris suave
-\definecolor{negro}{RGB}{0, 0, 0}                % Negro puro
-
-\newtcolorbox{dem_box}[1]{
-before=\par\smallskip\centering,
-colframe=azulSuave!70,
-colback=white,
-fonttitle=\bfseries,
-coltitle=negro,
-title=#1,
-flushleft title,
-width=1\linewidth,
-breakable = true
-}
-
-\newtcolorbox{ejem_box}[1]{
-before=\par\smallskip\centering,
-colframe=verdeSuave!70,
-colback=white,
-fonttitle=\bfseries,
-coltitle=negro,
-title=#1,
-flushleft title,
-width=1\linewidth,
-breakable = true
-}
-
-\newtcolorbox{ej_box}[1]{
-before=\par\smallskip\centering,
-colframe=naranjaSuave!70,
-colback=white,
-fonttitle=\bfseries,
-coltitle=negro,
-title=#1,
-flushleft title,
-width=1\linewidth,
-breakable = true
-}
-
-\newtcolorbox{mod_box}[1]{
-before=\par\smallskip\centering,
-colframe=amarilloOscuro!85,
-colback=amarilloPastel!30,
-fonttitle=\bfseries,
-coltitle=negro,
-title=#1,
-flushleft title,
-width=0.94\textwidth,
-breakable = true
-}
-
 
 
 \setstretch{1.2}
@@ -258,7 +186,7 @@ Esta memoria recoge el desarrollo del proyecto de la asignatura \textit{Arquitec
 \section{Desarrollo del algoritmo}
 Se ha desarrollado el algoritmo de inversión de blanco y negro (Algoritmo número \(\#3)\). Para 
 desarrollar el código hemos usado la máquina virtual brindada por los profesores, así como
-la plantilla dada por los profesores de la asignatura.
+la plantilla dada.
 \vspace{2ex}
 
 Dentro de esta plantilla ya nos venían incluidas las líneas de código 
@@ -268,43 +196,154 @@ Es por ello que nosotros únicamente hemos implementado las comprobaciones y el 
 \vspace{2ex}
 
 \subsection{Comprobaciones e inicialización}
-Antes de implimentar el algoritmo, se debe realizar 
-las comprobaciones necesarias para 
+Antes de implementar el algoritmo, se debe realizar 
+las comprobaciones necesarias para asegurarnos que la imagen existe 
+y la inicialización de las variables. Para verificar que la imagen existe 
+implemetamos la siguiente función:
+\begin{lstlisting}[style=cppStyle]
+CImg<data_t> load_image(const char* filename) {
+    if (access(filename, F_OK) == -1) {
+        fprintf(stderr, "Error: la imagen '%s' no existe.\n", filename);
+        exit(EXIT_FAILURE);
+    }
 
-Para desarrollar la función filter nos ayudamos de la formúla 
-que había en las diapositivas. Esta función lo que hace 
-es para cada pixel de la imagen debe multiplicar cada componente de 
-cada pixel de la 
-imagen por su correspondiente peso. Estos son los siguientes:
+    CImg<data_t> image(filename); 
+    return image;
+}
+\end{lstlisting}
+
+Este método recibe en forma de parámetro el nombre del archivo y llama a la 
+función \texttt{access()} con el nombre del archivo y el parámetro \texttt{F\_OK}. 
+Si la imagen no existe, la función \texttt{access()} devuelve \(-1\) y se muestra
+un mensaje de error por pantalla y se termina la ejecución del programa.
+\vspace{2ex}
+
+En caso de que la imagen exista, se crea un objeto de la clase \texttt{CImg}
+y se devuelve. También se ha de comprobar que las dimensiones de la imagen 
+destino coinciden con las de la imagen original, así como el espectro.
+Esto se hace con el siguiente fragmento de código:
+\begin{lstlisting}[style=cppStyle]
+  if (static_cast<unsigned int>(dstImage.width()) != width || 
+		static_cast<unsigned int>(dstImage.height()) != height || 
+		static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
+		fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
+		free(pDstImage);
+		exit(EXIT_FAILURE);
+	}
+\end{lstlisting}
+
+En caso de que las dimensiones no coincidan, se muestra una excepción por 
+pantalla.
+\vspace{2ex}
+
+
+También modificamos 
+el tipo de dato que se va a usar de float a double.
+Por otro lado definimos los pesos que se van a usar en el algoritmo y
+el brillo máximo. Como se muestra 
+en el siguiente fragmento de código:
+\begin{lstlisting}[style=cppStyle]
+#define R_WEIGHT 0.3
+#define G_WEIGHT 0.59
+#define B_WEIGHT 0.11
+#define MAX_BRIGHTNESS 255.0
+\end{lstlisting}
+
+
+\vspace{2ex}
+
+Por otro lado, definimos las variables de tiempo.
+\begin{lstlisting}[style=cppStyle]
+  struct timespec tStart, tEnd; // Variables for time measurement
+	double elapsedTime;     // Elapsed time in seconds
+  
+	
+\end{lstlisting} 
+\vspace{2ex}
+
+Para medir el tiempo inicial y final usamos la función \texttt{clock\_gettime()} con los 
+parámetros \texttt{CLOCK\_REALTIME} y la dirección de memoria 
+de las variables \texttt{tStart} y \texttt{tEnd}. En caso de que la función falle, 
+se muestra un mensaje de error y se termina la ejecución
+
+\begin{lstlisting}[style = cppStyle]
+if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
+		printf("Error al obtener el tiempo inicial");
+		exit(EXIT_FAILURE);
+	}
+
+  if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
+		printf("Error al obtener el tiempo final");
+		exit(EXIT_FAILURE);
+	}
+\end{lstlisting}
+
+Finalmente calculamos el tiempo transcurrido y lo mostramos por pantalla.
+\begin{lstlisting}[style=cppStyle]
+  elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
+	printf("Elapsed time (%d repetitions): %.6f seconds\n", N_ITERATIONS, elapsedTime);
+\end{lstlisting}
+
+\subsection{Implementación de algoritmo}
+
+El algoritmo a implementar ha sido el de inversión de blanco y negro. Para ello implementamos 
+la función filter,  esta para cada pixel 
+de la imagen multiplica cada componente del imagen original por su correspondiente peso, suma estos 
+y lo atribuye a una variable \texttt{L} de tipo \texttt{double}.  Los pesos son los siguientes:
 \begin{enumerate}
     \item Componente roja: Esta ha de ser multiplicada por \(0.3\)
     \item Componente verde: Esta ha de ser multiplicada por \(0.59\)
     \item Componente azul: Esta ha de ser multiplicada por \(0.11\)
 \end{enumerate}
-Por último, lo que hay que 
-hacer es restar el valor obtenido a \(255\) (valor máximo de brillo)
-y asignar este valor a las tres componentes del pixel de la imagen.
-\vspace{2ex}
 
+Por último hay que realizar la inversión de colores, es por 
+ello  hay que restar el valor obtenido a \(255\) (valor máximo de brillo)
+y asignar este valor a las tres componentes de cada pixel de la imagen destino.
 Como esto tiene que hacerse para cada pixel, realizamos un bucle 
-que recorre todos los pixeles de la imagen. 
+que recorre todos los pixeles de la imagen. A contiuación se muestra un fragmento 
+de código de la función:
 
-
-\begin{lstlisting}
-    void filter (filter_args_t args) {
+\begin{lstlisting}[style=cppStyle]
+void filter (filter_args_t args) {
     for (uint i = 0; i < args.pixelCount; i++) {
-		data_t L = *(args.pRsrc + i) * R_WEIGHT + 
-				*(args.pGsrc + i) * G_WEIGHT + 
-				*(args.pBsrc + i) * B_WEIGHT;
-		
-		L = MAX_BRIGHTNESS - L;
+        data_t L = *(args.pRsrc + i) * R_WEIGHT + 
+                *(args.pGsrc + i) * G_WEIGHT + 
+                *(args.pBsrc + i) * B_WEIGHT;
+        
+        L = MAX_BRIGHTNESS - L;
 
-		*(args.pRdst + i) = L;
-		*(args.pGdst + i) = L;
-		*(args.pBdst + i) = L;
-	}
+        *(args.pRdst + i) = L;
+        *(args.pGdst + i) = L;
+        *(args.pBdst + i) = L;
+    }
 }
 \end{lstlisting}
+
+Como el tiempo debía estar entre 8 y 15 segundos, hemos realizado un bucle de 125 
+iteraciones de la función filter para que el tiempo de ejecución del programa esté dentro de este rango.
+\vspace{3ex}
+\begin{lstlisting}[style=cppStyle]
+  for (int i = 0; i < N_ITERATIONS; i++){
+		filter(filter_args);
+	}
+\end{lstlisting}
+
+A continuación se muestra la imagen original y la imagen resultante tras aplicar el filtro.
+
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{ImagenOriginal.png}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{ImagenResultanteMonohilo.png}
+\end{minipage}
+\end{figure}
+
 \section{Desarrollo del Proyecto}
 \subsection{Fase 1: Implementación Monohilo}
 Para la primera fase del proyecto, se ha desarrollado un 
