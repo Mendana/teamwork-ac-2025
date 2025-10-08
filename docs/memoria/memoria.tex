@@ -175,10 +175,10 @@ if (static_cast<unsigned int>(dstImage.width()) != width ||
     exit(EXIT_FAILURE);
 }
 \end{lstlisting}
+\vspace{2ex}
 
-En caso de discrepancia, se muestra un mensaje de error y se detiene la ejecución del programa.\vspace{2ex}
-
-\noindent Asimismo, se modificó el tipo de dato empleado de \texttt{float} a \texttt{double}. Se definieron también los pesos para las componentes de color y el brillo máximo, como se muestra a continuación:
+En caso de discrepancia, se muestra un mensaje de error y se detiene la ejecución del programa.
+Asimismo, se modificó el tipo de dato empleado de \texttt{float} a \texttt{double}. Se definieron también los pesos para las componentes de color y el brillo máximo, como se muestra a continuación:
 
 \begin{lstlisting}[style=cppStyle]
 #define R_WEIGHT 0.3
@@ -186,8 +186,9 @@ En caso de discrepancia, se muestra un mensaje de error y se detiene la ejecuci�
 #define B_WEIGHT 0.11
 #define MAX_BRIGHTNESS 255.0
 \end{lstlisting}
+\vspace{2ex}
 
-\noindent Para medir el tiempo de ejecución, se emplearon las funciones \texttt{clock\_gettime()} con los parámetros \texttt{CLOCK\_REALTIME} y las direcciones de memoria de las variables temporales. En caso de error, se muestra un mensaje y se finaliza la ejecución:
+Para medir el tiempo de ejecución, se emplearon las funciones \texttt{clock\_gettime()} con los parámetros \texttt{CLOCK\_REALTIME} y las direcciones de memoria de las variables temporales. En caso de error, se muestra un mensaje y se finaliza la ejecución:
 
 \begin{lstlisting}[style=cppStyle]
 if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
@@ -200,6 +201,7 @@ if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
     exit(EXIT_FAILURE);
 }
 \end{lstlisting}
+\vspace{2ex}
 
 Finalmente, se calcula el tiempo transcurrido y se muestra por la salida estándar:
 \begin{lstlisting}[style=cppStyle]
