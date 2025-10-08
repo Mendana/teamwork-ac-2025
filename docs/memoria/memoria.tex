@@ -6,14 +6,14 @@
 
 % Paquetes de idioma y matemáticas
 \usepackage[spanish]{babel}
-\usepackage{amsmath,amsfonts, amssymb, mathtools} % Podemos añadir amssymb, amsthm o bm
+\usepackage{amsmath,amsfonts, amssymb, mathtools}
 
 % Paquetes de diseño y gráficos
 \usepackage{graphicx, xparse}
-\usepackage[top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry} % Este paquete permite modificar los márgenes del documento
+\usepackage[top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 \usepackage{setspace}
 \usepackage{xcolor, tcolorbox, booktabs, multirow, colortbl}
-\usepackage{cancel} %tachar cosas
+\usepackage{cancel}
 \tcbuselibrary{breakable}
 \usepackage{titlesec}
 \usepackage{array}
@@ -27,115 +27,76 @@
 % Paquetes de código
 \usepackage{listings, lstautogobble}
 
-% Hyperref debe ir al final (excepto algunos paquetes específicos)
-\usepackage[colorlinks=true, allcolors=blue]{hyperref} % Se indica que los hipervínculos van todos en azul
+% Hyperref debe ir al final
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
 \graphicspath{ {images/}}
 
+% Colores personalizados
+\definecolor{CppBackground}{RGB}{248, 248, 248}
+\definecolor{CppBorder}{RGB}{220, 220, 220}
+\definecolor{CppTags}{RGB}{0, 119, 170}
+\definecolor{CppAttributes}{RGB}{165, 42, 42}
+\definecolor{CppValues}{RGB}{0, 128, 0}
+\definecolor{CppStrings}{RGB}{34, 139, 34}
+\definecolor{CppComments}{RGB}{128, 128, 128}
+\definecolor{CppLineNumbers}{RGB}{160, 160, 160}
 
-% Colores modernos para HTML
-\definecolor{CppBackground}{RGB}{248, 248, 248}    % Fondo gris muy claro
-\definecolor{CppBorder}{RGB}{220, 220, 220}        % Borde gris
-\definecolor{CppTags}{RGB}{0, 119, 170}            % Azul medio para etiquetas
-\definecolor{CppAttributes}{RGB}{165, 42, 42}      % Marrón oscuro para atributos
-\definecolor{CppValues}{RGB}{0, 128, 0}            % Verde para valores
-\definecolor{CppStrings}{RGB}{34, 139, 34}         % Verde oscuro para strings
-\definecolor{CppComments}{RGB}{128, 128, 128}      % Gris para comentarios
-\definecolor{CppLineNumbers}{RGB}{160, 160, 160}   % Gris para números de línea
-
-% Definición mejorada de HTML como lenguaje
+% Definición del lenguaje C++
 \lstdefinelanguage{CPP}{
   sensitive=true,
   morecomment=[s]{/*}{*/},
   morestring=[b]",
   morestring=[b]',
-  alsoletter={=},
-  alsodigit={-},
-  % Palabras clave en dos grupos - etiquetas y atributos
-  morekeywords=[1]{
-    auto,break,case,char,const,continue,default,do,double,else,
+  morekeywords=[1]{auto,break,case,char,const,continue,default,do,double,else,
     enum,extern,float,for,goto,if,int,long,register,return,
     short,signed,sizeof,static,struct,switch,typedef,union,
     unsigned,void,volatile,while,class,private,protected,
     public,this,using,namespace,new,delete,true,false,nullptr,
     template,typename,typeid,constexpr,const_cast,dynamic_cast,
     explicit,friend,inline,mutable,nolint,reinterpret_cast,
-    static_cast,virtual
-  },
-  morekeywords=[2]{
-    int,float,double,char,void,bool,true,false,nullptr,size_t,uint8_t,uint16_t,uint32_t,uint64_t
-  }
+    static_cast,virtual},
+  morekeywords=[2]{int,float,double,char,void,bool,true,false,nullptr,size_t,
+    uint8_t,uint16_t,uint32_t,uint64_t}
 }
 
-% Configuración avanzada y estética para HTML - ESTILO MODERNO
+% Estilo de código
 \lstdefinestyle{cppStyle}{
   language=CPP,
   backgroundcolor=\color{CppBackground},
   basicstyle=\ttfamily\footnotesize,
-  % Estilo de las etiquetas y atributos
-  keywordstyle=[1]{\color{CppTags}\bfseries},         % Etiquetas Cpp
-  keywordstyle=[2]{\color{CppAttributes}},            % Atributos Cpp
-  stringstyle=\color{CppStrings},                     % Valores de atributos entre comillas
-  commentstyle=\color{CppComments}\itshape,           % Comentarios
-  % Colorear etiquetas completas incluyendo < y >
-  literate=
-    {<}{\textcolor{CppTags}{\textbf{<}}}{1}
-    {>}{\textcolor{CppTags}{\textbf{>}}}{1}
-    {/}{\textcolor{CppTags}{\textbf{/}}}{1}
-    {=}{\textcolor{CppAttributes}{\textbf{=}}}{1},
-  % Colores para atributos y valores
-  moredelim=**[s][\color{CppAttributes}]{\ }{=},      % Atributos
-  % Configuración de presentación
-  breaklines=true,                                     % Romper líneas largas
-  breakatwhitespace=true,                              % Romper en espacios
-  columns=fullflexible,                                % Espaciado flexible
-  showspaces=false,                                    % No mostrar espacios
-  showstringspaces=false,                              % No mostrar espacios en strings
-  showtabs=false,                                      % No mostrar tabulaciones
-  tabsize=2,                                           % Tamaño de tabulación
-  aboveskip=3pt,                                       % Más espacio vertical (moderno)
-  belowskip=3pt,                                       % Más espacio vertical (moderno)
-  % Estilo de marco MODERNO Y LIMPIO - LÍNEA SUPERIOR E INFERIOR
-  frame=topline,                                       % Solo líneas superior e inferior (minimalista)
-  framesep=8pt,                                        % Más separación (breathing room)
-  framerule=1.5pt,                                     % Línea de grosor medio
-  rulecolor=\color{CppBorder},                        % Color del marco
-  xleftmargin=10pt,                                    % Margen equilibrado
-  xrightmargin=0pt,                                    % Sin margen derecho (limpio)
-  numbers=left,                                        % Números a la izquierda para Cpp
-  numberstyle=\tiny\color{CppLineNumbers}\sffamily,   % Fuente sans-serif moderna
-  numbersep=15pt,                                      % Más separación de números (aire)
-  % Etiqueta identificativa moderna con fondo sutil
+  keywordstyle=[1]{\color{CppTags}\bfseries},
+  keywordstyle=[2]{\color{CppAttributes}},
+  stringstyle=\color{CppStrings},
+  commentstyle=\color{CppComments}\itshape,
+  breaklines=true,
+  columns=fullflexible,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=topline,
+  framesep=8pt,
+  framerule=1.5pt,
+  rulecolor=\color{CppBorder},
+  xleftmargin=10pt,
+  numbers=left,
+  numberstyle=\tiny\color{CppLineNumbers}\sffamily,
+  numbersep=15pt,
   title={\footnotesize\colorbox{CppBackground!50}{\textcolor{CppTags}{}}},
-  % Soporte para caracteres especiales en español
   literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
            {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
            {ñ}{{\~n}}1 {Ñ}{{\~N}}1,
-  emph={doctype,lang,href,class,id},
-  emphstyle={\color{CppAttributes}\bfseries}
 }
-
-
-\titleformat{\part}[display]
-  {\normalfont\Huge\bfseries} % Estilo del texto
-  {}           % Prefijo antes del título de la parte
-  {20pt}                      % Separación entre "Parte I" y el título
-  {\Huge}                     % Estilo del título de la parte
-
 
 \setstretch{1.2}
 \decimalpoint
-
-% \title{\textbf{BASES DE DATOS: } EJERCICIOS RESUELTOS}
-% \author{Diego Díaz Mendaña}
-%\date{Fecha}
 
 \begin{document}
 
 \begin{titlepage}
     \begin{center}
-        % Logo de la institución
-        \includegraphics[width=0.3\textwidth]{logo_escuela.png} \\[1cm] % Cambiar logo_escuela por el nombre del archivo con el logo
+        \includegraphics[width=0.3\textwidth]{logo_escuela.png} \\[1cm]
         \vspace{1cm}
         
         \textbf{\LARGE ESCUELA DE INGENIERÍA INFORMÁTICA DE OVIEDO} \\[1.5cm]
@@ -155,17 +116,15 @@
         
         \vfill
         
-        % Información del alumno
         \begin{flushright}
             \textbf{Grupo de prácticas:} PL.1 - B \\[0.3cm]
             \textbf{Titulación:} PCEO Informática y Matemáticas \\[0.3cm]
         \end{flushright}
         
         \vfill
-        
         \today \\[1cm]
     \end{center}
-  \end{titlepage}
+\end{titlepage}
 
 \newpage
 \hypersetup{linkcolor=black}
@@ -174,32 +133,23 @@
 \newpage
 
 \section{Introducción}
-Esta memoria recoge el desarrollo del proyecto de la asignatura \textit{Arquitectura de Computadores}, impartida en el curso 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El proyecto tiene como objetivo aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Además, se ha de analizar el rendimiento del filtro y compararlo con las implementaciones monohilo y multihilo.\vspace{2ex}
+La presente memoria recoge el desarrollo del proyecto correspondiente a la asignatura \textit{Arquitectura de Computadores}, impartida durante el curso académico 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El objetivo del proyecto es aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Asimismo, se realiza un análisis del rendimiento del filtro y una comparación entre las versiones monohilo y multihilo.\vspace{2ex}
 
-\noindent El trabajo se ha estructurado en varias fases progresivas:
+\noindent El trabajo se ha estructurado en distintas fases progresivas:
 \begin{itemize}
-    \item \textbf{Entrega 1 (Monohilo):} Implementación básica del filtro de imágenes en un solo hilo.
-    \item \textbf{Entrega 2 (SIMD y Multihilo):} Optimización del filtro utilizando instrucciones SIMD y paralelización con múltiples hilos.
+    \item \textbf{Entrega 1 (Monohilo):} Implementación básica del filtro de imágenes en un único hilo de ejecución.
+    \item \textbf{Entrega 2 (SIMD y Multihilo):} Optimización del filtro mediante el uso de instrucciones SIMD y la paralelización con múltiples hilos.
 \end{itemize}
 \vspace{3ex}
 
 \section{Desarrollo del algoritmo}
-Se ha desarrollado el algoritmo de inversión de blanco y negro (Algoritmo número \(\#3)\). Para 
-desarrollar el código hemos usado la máquina virtual brindada por los profesores, así como
-la plantilla dada.
-\vspace{2ex}
+Se desarrolló el algoritmo de inversión en blanco y negro (Algoritmo número \#3). El desarrollo se realizó utilizando la máquina virtual proporcionada por el profesorado, junto con la plantilla base facilitada.\vspace{2ex}
 
-Dentro de esta plantilla ya nos venían incluidas las líneas de código 
-con los que obteníamos tanto el número de pixeles como los punteros 
-a los arrays RGB de la imagen destino y salida.
-Es por ello que nosotros únicamente hemos implementado las comprobaciones y el algoritmo.
-\vspace{2ex}
+\noindent La plantilla incluía las líneas de código necesarias para obtener el número de píxeles, así como los punteros a los arreglos RGB de las imágenes de entrada y salida. Por tanto, fue necesario únicamente implementar las comprobaciones y el algoritmo principal.
 
 \subsection{Comprobaciones e inicialización}
-Antes de implementar el algoritmo, se debe realizar 
-las comprobaciones necesarias para asegurarnos que la imagen existe 
-y la inicialización de las variables. Para verificar que la imagen existe 
-implemetamos la siguiente función:
+Antes de implementar el algoritmo, se llevaron a cabo las comprobaciones necesarias para verificar la existencia del archivo de imagen y la correcta inicialización de las variables. La comprobación de existencia se realiza mediante la siguiente función:
+
 \begin{lstlisting}[style=cppStyle]
 CImg<data_t> load_image(const char* filename) {
     if (access(filename, F_OK) == -1) {
@@ -212,36 +162,24 @@ CImg<data_t> load_image(const char* filename) {
 }
 \end{lstlisting}
 
-Este método recibe en forma de parámetro el nombre del archivo y llama a la 
-función \texttt{access()} con el nombre del archivo y el parámetro \texttt{F\_OK}. 
-Si la imagen no existe, la función \texttt{access()} devuelve \(-1\) y se muestra
-un mensaje de error por pantalla y se termina la ejecución del programa.
-\vspace{2ex}
+Esta función recibe como parámetro el nombre del archivo y emplea la llamada \texttt{access()} con el parámetro \texttt{F\_OK}. Si la imagen no existe, la función devuelve \(-1\), se muestra un mensaje de error en la salida estándar y finaliza la ejecución del programa.\vspace{2ex}
 
-En caso de que la imagen exista, se crea un objeto de la clase \texttt{CImg}
-y se devuelve. También se ha de comprobar que las dimensiones de la imagen 
-destino coinciden con las de la imagen original, así como el espectro.
-Esto se hace con el siguiente fragmento de código:
+En caso de existir el archivo, se crea un objeto de la clase \texttt{CImg} y se devuelve. Adicionalmente, se comprueba que las dimensiones y el espectro de la imagen de salida coincidan con los de la imagen original:
+
 \begin{lstlisting}[style=cppStyle]
-  if (static_cast<unsigned int>(dstImage.width()) != width || 
-		static_cast<unsigned int>(dstImage.height()) != height || 
-		static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
-		fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
-		free(pDstImage);
-		exit(EXIT_FAILURE);
-	}
+if (static_cast<unsigned int>(dstImage.width()) != width || 
+    static_cast<unsigned int>(dstImage.height()) != height || 
+    static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
+    fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
+    free(pDstImage);
+    exit(EXIT_FAILURE);
+}
 \end{lstlisting}
 
-En caso de que las dimensiones no coincidan, se muestra una excepción por 
-pantalla.
-\vspace{2ex}
+En caso de discrepancia, se muestra un mensaje de error y se detiene la ejecución del programa.\vspace{2ex}
 
+Asimismo, se modificó el tipo de dato empleado de \texttt{float} a \texttt{double}. Se definieron también los pesos para las componentes de color y el brillo máximo, como se muestra a continuación:
 
-También modificamos 
-el tipo de dato que se va a usar de float a double.
-Por otro lado definimos los pesos que se van a usar en el algoritmo y
-el brillo máximo. Como se muestra 
-en el siguiente fragmento de código:
 \begin{lstlisting}[style=cppStyle]
 #define R_WEIGHT 0.3
 #define G_WEIGHT 0.59
@@ -249,66 +187,37 @@ en el siguiente fragmento de código:
 #define MAX_BRIGHTNESS 255.0
 \end{lstlisting}
 
+\noindent Para medir el tiempo de ejecución, se emplearon las funciones \texttt{clock\_gettime()} con los parámetros \texttt{CLOCK\_REALTIME} y las direcciones de memoria de las variables temporales. En caso de error, se muestra un mensaje y se finaliza la ejecución:
 
-\vspace{2ex}
-
-Por otro lado, definimos las variables de tiempo.
 \begin{lstlisting}[style=cppStyle]
-  struct timespec tStart, tEnd; // Variables for time measurement
-	double elapsedTime;     // Elapsed time in seconds
-  
-	
-\end{lstlisting} 
-\vspace{2ex}
-
-Para medir el tiempo inicial y final usamos la función \texttt{clock\_gettime()} con los 
-parámetros \texttt{CLOCK\_REALTIME} y la dirección de memoria 
-de las variables \texttt{tStart} y \texttt{tEnd}. En caso de que la función falle, 
-se muestra un mensaje de error y se termina la ejecución
-
-\begin{lstlisting}[style = cppStyle]
 if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
-		printf("Error al obtener el tiempo inicial");
-		exit(EXIT_FAILURE);
-	}
+    printf("Error al obtener el tiempo inicial");
+    exit(EXIT_FAILURE);
+}
 
-  if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
-		printf("Error al obtener el tiempo final");
-		exit(EXIT_FAILURE);
-	}
+if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
+    printf("Error al obtener el tiempo final");
+    exit(EXIT_FAILURE);
+}
 \end{lstlisting}
 
-Finalmente calculamos el tiempo transcurrido y lo mostramos por pantalla.
+Finalmente, se calcula el tiempo transcurrido y se muestra por la salida estándar:
 \begin{lstlisting}[style=cppStyle]
-  elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
-	printf("Elapsed time (%d repetitions): %.6f seconds\n", N_ITERATIONS, elapsedTime);
+elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + 
+              (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
+printf("Elapsed time (%d repetitions): %.6f seconds\n", 
+        N_ITERATIONS, elapsedTime);
 \end{lstlisting}
 
-\subsection{Implementación de algoritmo}
-
-El algoritmo a implementar ha sido el de inversión de blanco y negro. Para ello implementamos 
-la función filter,  esta para cada pixel 
-de la imagen multiplica cada componente del imagen original por su correspondiente peso, suma estos 
-y lo atribuye a una variable \texttt{L} de tipo \texttt{double}.  Los pesos son los siguientes:
-\begin{enumerate}
-    \item Componente roja: Esta ha de ser multiplicada por \(0.3\)
-    \item Componente verde: Esta ha de ser multiplicada por \(0.59\)
-    \item Componente azul: Esta ha de ser multiplicada por \(0.11\)
-\end{enumerate}
-
-Por último hay que realizar la inversión de colores, es por 
-ello  hay que restar el valor obtenido a \(255\) (valor máximo de brillo)
-y asignar este valor a las tres componentes de cada pixel de la imagen destino.
-Como esto tiene que hacerse para cada pixel, realizamos un bucle 
-que recorre todos los pixeles de la imagen. A contiuación se muestra un fragmento 
-de código de la función:
+\subsection{Implementación del algoritmo}
+El algoritmo implementado corresponde al filtro de inversión en escala de grises. Para cada píxel de la imagen, la función \texttt{filter} calcula una luminosidad ponderada a partir de las componentes RGB, utilizando los coeficientes definidos previamente. El valor resultante se invierte respecto al brillo máximo y se asigna a las tres componentes del píxel en la imagen de salida:
 
 \begin{lstlisting}[style=cppStyle]
 void filter (filter_args_t args) {
     for (uint i = 0; i < args.pixelCount; i++) {
         data_t L = *(args.pRsrc + i) * R_WEIGHT + 
-                *(args.pGsrc + i) * G_WEIGHT + 
-                *(args.pBsrc + i) * B_WEIGHT;
+                   *(args.pGsrc + i) * G_WEIGHT + 
+                   *(args.pBsrc + i) * B_WEIGHT;
         
         L = MAX_BRIGHTNESS - L;
 
@@ -319,79 +228,70 @@ void filter (filter_args_t args) {
 }
 \end{lstlisting}
 
-Como el tiempo debía estar entre 8 y 15 segundos, hemos realizado un bucle de 125 
-iteraciones de la función filter para que el tiempo de ejecución del programa esté dentro de este rango.
-\vspace{3ex}
+Dado que el tiempo de ejecución debía situarse entre 8 y 15 segundos, se realizó un bucle de 125 iteraciones de la función \texttt{filter} para mantener el tiempo dentro del rango esperado:
 \begin{lstlisting}[style=cppStyle]
-  for (int i = 0; i < N_ITERATIONS; i++){
-		filter(filter_args);
-	}
+for (int i = 0; i < N_ITERATIONS; i++) {
+    filter(filter_args);
+}
 \end{lstlisting}
 
-A continuación se muestra la imagen original y la imagen resultante tras aplicar el filtro.
-
+A continuación, se muestran la imagen original y la imagen resultante tras aplicar el filtro:
 
 \begin{figure}[h!]
 \centering
 \begin{minipage}[c]{0.45\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{ImagenOriginal.png}
+    \includegraphics[width=\linewidth,height=6cm,keepaspectratio]{ImagenOriginal.png}
+    \caption{Imagen original.}
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.45\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{ImagenResultanteMonohilo.png}
+    \includegraphics[width=\linewidth,height=6cm,keepaspectratio]{ImagenResultanteMonohilo.png}
+    \caption{Imagen resultante (versión monohilo).}
 \end{minipage}
 \end{figure}
 
-\section{Desarrollo del Proyecto}
-\subsection{Fase 1: Implementación Monohilo}
-Para la primera fase del proyecto, se ha desarrollado un 
-algoritmo de 
-\vspace{3ex}
 
-\section{Resultados y Análisis}
-....
-\vspace{3ex}
-
-\section{Conclusiones}
-....
-\vspace{3ex}
 
 \newpage
 
-% ================================
-% ANEXOS
-% ================================
+\section{Desarrollo del Proyecto}
+\subsection{Fase 1: Implementación Monohilo}
+En la primera fase del proyecto se desarrolló la versión monohilo del algoritmo, centrada en la comprensión del flujo de procesamiento y en la verificación de la corrección del filtro aplicado sobre las imágenes.
 
+\section{Resultados y Análisis}
+(Se deben incluir los tiempos de ejecución, comparativas entre versiones y gráficos de rendimiento.)
+
+\section{Conclusiones}
+(Se deben exponer los principales aprendizajes, la mejora de rendimiento observada y las implicaciones del uso de SIMD y multihilo en procesamiento de imágenes.)
+
+\newpage
 \part*{ANEXOS}
-
 \appendix
 \renewcommand{\thesection}{\Alph{section}}
 
 \section{Flujo de trabajo y metodología de desarrollo}
-Todo el desarrollo del proyecto se puede seguir en el repositorio de \textit{GitHub}: \href{https://www.github.com/Mendana/teamwork-ac-2025}{ver repositorio}. Para la gestión del proyecto y poder garantizar un desarrollo colaborativo, se ha establecido un flujo de trabajo común basado en \textit{Git} y \textit{GitHub} como herramientas centrales de organización y control de versiones. Los aspectos clave son:
+Todo el desarrollo del proyecto se encuentra disponible en el repositorio de \textit{GitHub}: \href{https://www.github.com/Mendana/teamwork-ac-2025}{ver repositorio}. Para garantizar un trabajo colaborativo eficiente, se estableció un flujo de trabajo común basado en las herramientas \textit{Git} y \textit{GitHub} como elementos centrales de control de versiones. Los aspectos clave son:
+
 \begin{itemize}
-    \item \textbf{Repositorio compartido:} con el código, documentación y recursos del proyecto.
-    \item \textbf{Issue:} cada tarea se define como una \textit{issue} en \textit{GitHub}, con un responsable y un \textit{deadline}.
-    \item \textbf{Project Board:} se emplea un tablero \textit{Kanban} con columnas \textit{To Do}, \textit{In Progress}, \textit{Review} y \textit{Done} para visualizar el estado de las tareas.
-    \item \textbf{Milestones:} cada entrega del proyecto se ha asociado a un \textit{milestone} que agrupa las \textit{issues} correspondientes a dicha fase.
-    \item \textbf{Pull Requests:} todas las contribuciones se realizan mediante \textit{pull requests} que deben ser revisadas y aprobadas por, al menos, 3 de los 4 miembros del equipo antes de integrarse en \texttt{main}.
-    \item \textbf{Documentación:} se guarda la documentación en la carpeta \texttt{docs/}.
+    \item \textbf{Repositorio compartido:} Contiene el código, la documentación y los recursos del proyecto.
+    \item \textbf{Issues:} Cada tarea se define como una \textit{issue} en \textit{GitHub}, asignada a un responsable con una fecha límite.
+    \item \textbf{Project Board:} Se emplea un tablero \textit{Kanban} con las columnas \textit{To Do}, \textit{In Progress}, \textit{Review} y \textit{Done} para visualizar el progreso del trabajo.
+    \item \textbf{Milestones:} Cada entrega del proyecto se asocia a un \textit{milestone} que agrupa las \textit{issues} relacionadas.
+    \item \textbf{Pull Requests:} Todas las contribuciones se integran mediante \textit{pull requests}, revisadas y aprobadas por, al menos, tres de los cuatro miembros del equipo antes de fusionarse en la rama principal.
+    \item \textbf{Documentación:} Se conserva en la carpeta \texttt{docs/}.
 \end{itemize}
-\vspace{2ex}
 
 \subsection{Metodología}
 \label{anexo:metodologia}
-El equipo ha adoptado una metodología ágil adaptada al contexto académico del proyecto, inspirada en un enfoque híbrido entre \textit{Scrum} y \textit{Kanban}. Los aspectos clave de esta metodología son:
+El equipo adoptó una metodología ágil adaptada al contexto académico, inspirada en un enfoque híbrido entre \textit{Scrum} y \textit{Kanban}. Los elementos principales de esta metodología son:
 \begin{itemize}
-    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) correspondientes a las entregas del proyecto.
-    \item Las tareas se dividen en \textbf{issues} manejables y se priorizan según su importancia y dependencia. Estas tareas son asignadas a los miembros del equipo.
-    \item El \textbf{project board} permite al equipo visualizar el progreso y gestionar las tareas de manera eficiente.
-    \item La revisión colectiva de los \textit{pull requests} fomenta la calidad del código y el aprendizaje compartido.
-    \item Las dependencias entre issues se gestionan mediante etiquetas y referencias cruzadas en \textit{GitHub}.
+    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) que corresponden a las entregas del proyecto.
+    \item Las tareas se dividen en \textbf{issues} manejables, priorizadas según su relevancia y dependencias, y se asignan a los miembros del equipo.
+    \item El \textbf{Project Board} facilita la visualización del progreso y la gestión eficiente de las tareas.
+    \item La revisión colectiva de los \textit{pull requests} promueve la calidad del código y el aprendizaje conjunto.
+    \item Las dependencias entre tareas se gestionan mediante etiquetas y referencias cruzadas en \textit{GitHub}.
 \end{itemize}
-
-
 
 \end{document}
