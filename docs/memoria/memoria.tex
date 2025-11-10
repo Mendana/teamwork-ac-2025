@@ -56,7 +56,7 @@
     template,typename,typeid,constexpr,const_cast,dynamic_cast,
     explicit,friend,inline,mutable,nolint,reinterpret_cast,
     static_cast,virtual},
-  morekeywords=[2]{int,float,double,char,void,bool,true,false,nullptr,size_t,
+    morekeywords=[2]{int,float,double,char,void,bool,true,false,nullptr,size_t,
     uint8_t,uint16_t,uint32_t,uint64_t}
 }
 
@@ -142,10 +142,19 @@ La presente memoria recoge el desarrollo del proyecto correspondiente a la asign
 \end{itemize}
 \vspace{3ex}
 
-\section{Desarrollo del algoritmo}
-Se desarrolló el algoritmo de inversión en blanco y negro (Algoritmo número \#3). El desarrollo se realizó utilizando la máquina virtual proporcionada por el profesorado, junto con la plantilla base facilitada.\vspace{2ex}
+\section{Máquina virtual}
+Para el desarrollo del proyecto se utilizó la máquina virtual proporcionada por los profesores, a continuación se muestra una captura de pantalla 
+con la configuración del sistema:
+\begin{center}
+    \includegraphics[width=\textwidth]{./config-procesdor-vm.png}
+\end{center}
+\vspace{2ex}
 
-\noindent La plantilla incluía las líneas de código necesarias para obtener el número de píxeles, así como los punteros a los arreglos RGB de las imágenes de entrada y salida. Por tanto, fue necesario únicamente implementar las comprobaciones y el algoritmo principal.
+
+
+\section{Desarrollo del algoritmo}
+Se desarrolló el algoritmo de inversión en blanco y negro (Algoritmo número \#3). El desarrollo se realizó utilizando la máquina virtual proporcionada por el profesorado, junto con la plantilla base facilitada.
+\vspace{2ex}
 
 \subsection{Comprobaciones e inicialización}
 Antes de implementar el algoritmo, se llevaron a cabo las comprobaciones necesarias para verificar la existencia del archivo de imagen y la correcta inicialización de las variables. La comprobación de existencia se realiza mediante la siguiente función:
@@ -164,20 +173,7 @@ CImg<data_t> load_image(const char* filename) {
 
 Esta función recibe como parámetro el nombre del archivo y emplea la llamada \texttt{access()} con el parámetro \texttt{F\_OK}. Si la imagen no existe, la función devuelve \(-1\), se muestra un mensaje de error en la salida estándar y finaliza la ejecución del programa.\vspace{2ex}
 
-En caso de existir el archivo, se crea un objeto de la clase \texttt{CImg} y se devuelve. Adicionalmente, se comprueba que las dimensiones y el espectro de la imagen de salida coincidan con los de la imagen original:
-
-\begin{lstlisting}[style=cppStyle]
-if (static_cast<unsigned int>(dstImage.width()) != width || 
-    static_cast<unsigned int>(dstImage.height()) != height || 
-    static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
-    fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
-    free(pDstImage);
-    exit(EXIT_FAILURE);
-}
-\end{lstlisting}
-\vspace{2ex}
-
-En caso de discrepancia, se muestra un mensaje de error y se detiene la ejecución del programa.
+En caso de existir el archivo, se crea un objeto de la clase \texttt{CImg} y se devuelve. Adicionalmente, se comprueba que las dimensiones y el espectro de la imagen de salida coincidan con los de la imagen original.
 Asimismo, se modificó el tipo de dato empleado de \texttt{float} a \texttt{double}. Se definieron también los pesos para las componentes de color y el brillo máximo, como se muestra a continuación:
 
 \begin{lstlisting}[style=cppStyle]
@@ -188,22 +184,8 @@ Asimismo, se modificó el tipo de dato empleado de \texttt{float} a \texttt{doub
 \end{lstlisting}
 \vspace{2ex}
 
-Para medir el tiempo de ejecución, se emplearon las funciones \texttt{clock\_gettime()} con los parámetros \texttt{CLOCK\_REALTIME} y las direcciones de memoria de las variables temporales. En caso de error, se muestra un mensaje y se finaliza la ejecución:
-
-\begin{lstlisting}[style=cppStyle]
-if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
-    printf("Error al obtener el tiempo inicial");
-    exit(EXIT_FAILURE);
-}
-
-if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
-    printf("Error al obtener el tiempo final");
-    exit(EXIT_FAILURE);
-}
-\end{lstlisting}
-\vspace{2ex}
-
-Finalmente, se calcula el tiempo transcurrido y se muestra por la salida estándar:
+Para medir el tiempo de ejecución, se emplearon las funciones \texttt{clock\_gettime()} con los parámetros \texttt{CLOCK\_REALTIME} y las direcciones de memoria de las variables. En caso de error, se muestra un mensaje y se finaliza la ejecución. 
+Se calcula el tiempo transcurrido y se muestra por la salida estándar:
 \begin{lstlisting}[style=cppStyle]
 elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + 
               (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
