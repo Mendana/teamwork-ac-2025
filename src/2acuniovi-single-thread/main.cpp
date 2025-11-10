@@ -36,21 +36,6 @@ typedef struct {
 	uint pixelCount; // Size of the image in pixels
 } filter_args_t;
 
-/**
- * Load image for the algorithm
- * 
- * Retorna la imagen si existe y si no lanza excepción y finaliza el programa
- */
-CImg<data_t> load_image(const char* filename) {
-    if (access(filename, F_OK) == -1) {
-        fprintf(stderr, "Error: la imagen '%s' no existe.\n", filename);
-        exit(EXIT_FAILURE);
-    }
-
-    CImg<data_t> image(filename);  // Carga con CImg
-    return image; // Se devuelve por valor, usando el constructor de copia o move
-}
-
 /***********************************************
  * 
  * Algorithm. B&W inversion (#3).
@@ -80,8 +65,14 @@ void filter (filter_args_t args) {
 }
 
 int main() {
-	// Cargar imagen fuente
-    CImg<data_t> srcImage = load_image(SOURCE_IMG);
+	CImg<data_t> srcImage;
+	// Cargar imagen fuente - Controlando si existe
+	try {
+    	srcImage = CImg<data_t>(SOURCE_IMG);
+	} catch (CImgException& e) {
+		fprintf(stderr, "ERROR: la imagen '%s' no existe.\n", SOURCE_IMG);
+		exit(EXIT_FAILURE);
+	}
 
 	filter_args_t filter_args;
 	data_t *pDstImage; // Pointer to the new image pixels
