@@ -5,81 +5,204 @@
  */
 
 #include <stdio.h>
-#include <immintrin.h> // Required to use intrinsic functions
+#include <math.h>
+#include <time.h>
+#include <CImg.h>
 
+#define R_WEIGHT 0.3
+#define G_WEIGHT 0.59
+#define B_WEIGHT 0.11
+#define MAX_BRIGHTNESS 255.0
 
-// TODO: Example of use of intrinsic functions
-// This example doesn't include any code about image processing
+//Number of iterations of the filter so it reaches the required time
+#define N_ITERATIONS 125
 
+using namespace cimg_library;
 
-#define VECTOR_SIZE       18 // Array size. Note: It is not a multiple of 8
-#define ITEMS_PER_PACKET (sizeof(__m256)/sizeof(float))
+// Data type for image components
+typedef double data_t;
+typedef __m256d simd_t;
 
+const char* SOURCE_IMG      = "bailarina.bmp";
+const char* DESTINATION_IMG = "bailarina2.bmp";
+
+// Filter argument data type
+typedef struct {
+	data_t *pRsrc; // Pointers to the R, G and B components
+	data_t *pGsrc;
+	data_t *pBsrc;
+	data_t *pRdst;
+	data_t *pGdst;
+	data_t *pBdst;
+	uint pixelCount; // Size of the image in pixels
+} filter_args_t;
+
+#define ITEMS_PER_PACKET (sizeof(simd_t)/sizeof(data_t))
+
+/***********************************************
+ * 
+ * Algorithm. B&W inversion (#3).
+ * 
+ * Formula:
+ * 
+ * Para cada i = 0,...,pixelCount:
+ * 1) Convertir a B&W
+ * 	L(i) = 0.3 R(i) + 0.59 G(i) + 0.11 B(i)
+ * 
+ * 2) Invertir
+ * 	L(i) = 255 - L(i)
+ * 		
+ * *********************************************/
+void filter (filter_args_t args) {
+	// 
+	simd_t r_weight = _mm256_set1_pd(R_WEIGHT);
+	simd_t g_weight = _mm256_set1_pd(G_WEIGHT);
+	simd_t b_weight = _mm256_set1_pd(B_WEIGHT);
+	simd_t max_brightness = _mm256_set1_pd(MAX_BRIGHTNESS);
+
+	// Calculation of the size of the resulting array
+    uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
+
+	// 32 bytes (256 bits) packets. Used to stored aligned memory data
+    simd_t vr, vg, vb, L; 
+
+	// Main loop with SIMD instructions
+	for(uint i = 0; i < nPackets; i++){
+		uint pos = i * ITEMS_PER_PACKET;
+
+		vr = _mm256_loadu_pd(args.pRsrc + pos);
+		vg = _mm256_loadu_pd(args.pGsrc + pos);
+		vb = _mm256_loadu_pd(args.pBsrc + pos);
+
+		vr = _mm256_mul_pd(vr, r_weight);
+		vg = _mm256_mul_pd(vg, g_weight);
+		vb = _mm256_mul_pd(vb, b_weight);
+
+		L = _mm256_add_pd(vr, vg);
+		L = _mm256_add_pd(L, vb);
+
+		L = _mm256_sub_pd(max_brightness, L);
+
+		*(simd_t*)(args.pRdst + pos) = L;
+		*(simd_t*)(args.pGdst + pos) = L;
+		*(simd_t*)(args.pBdst + pos) = L;
+	}
+	
+	// Calculation of the remaining data, not enough items to use SIMD
+	for (uint i = nPackets * ITEMS_PER_PACKET; i < args.pixelCount; i++){
+		data_t L = *(args.pRsrc + i) * R_WEIGHT + 
+				*(args.pGsrc + i) * G_WEIGHT + 
+				*(args.pBsrc + i) * B_WEIGHT;
+		
+		L = MAX_BRIGHTNESS - L;
+
+		*(args.pRdst + i) = L;
+		*(args.pGdst + i) = L;
+		*(args.pBdst + i) = L;
+	}
+}
 
 int main() {
-
-	// Data arrays to sum. May be or not memory aligned to __m256 size (32 bytes)
-    float a[VECTOR_SIZE], b[VECTOR_SIZE];
-
-    // Calculation of the size of the resulting array
-    // How many 256 bit packets fit in the array?
-    int nPackets = (VECTOR_SIZE * sizeof(float)/sizeof(__m256));
-   
-    // Create an array aligned to 32 bytes (256 bits) memory boundaries to store the sum.
-    // Aligned memory access improves performance    
-    float *c = (float *)_mm_malloc(sizeof(float) * VECTOR_SIZE, sizeof(__m256));
-
-    // 32 bytes (256 bits) packets. Used to stored aligned memory data
-    __m256 va, vb; 
-
-    // Initialize data arrays
-    for (int i = 0; i < VECTOR_SIZE; i++) {
-        *(a + i) = (float) i;       // a =  0, 1, 2, 3, …
-        *(b + i) = (float) (2 * i); // b =  0, 2, 4, 6, …
-    }
-
-    // Set the initial c element's value to -1 using vector extensions
-    *(__m256 *) c = _mm256_set1_ps(-1);
-    *(__m256 *)(c + ITEMS_PER_PACKET)     = _mm256_set1_ps(-1);
-    *(__m256 *)(c + ITEMS_PER_PACKET * 2) = _mm256_set1_ps(-1);
-
-    // Data arrays a and b must not be memory aligned to __m256 data (32 bytes)
-    // so we use intermediate variables to avoid execution errors.
-    // We make an unaligned load of va and vb
-    va = _mm256_loadu_ps(a);      // va = a[0][1]…[7] = 0, 1, 2, 3,  4,  5,  6,  7
-    vb = _mm256_loadu_ps(b);      // vb = b[0][1]…[7] = 0, 2, 4, 6,  8, 10, 12, 14
-    
-    // Performs the addition of two aligned vectors, each vector containing 8 floats
-    *(__m256 *)c = _mm256_add_ps(va, vb);// c = c[0][1]…[7] = 0, 3, 6, 9, 12, 15, 18, 21
-
-    // Next packet
-    // va = a[8][9]…[15] =  8,  9, 10, 11, 12, 13, 14, 15
-    // vb = b[8][9]…[15] = 16, 18, 20, 22, 24, 26, 28, 30
-    //  c = c[8][9]…[15] = 24, 27, 30, 33, 36, 39, 42, 45
-    va = _mm256_loadu_ps((a + ITEMS_PER_PACKET)); 
-    vb = _mm256_loadu_ps((b + ITEMS_PER_PACKET)); 
-    *(__m256 *)(c + ITEMS_PER_PACKET) = _mm256_add_ps(va, vb);
-
-    // If vectors va and vb have not a number of elements multiple of ITEMS_PER_PACKET 
-    // it is necessary to differentiate the last iteration. 
-
-    // Calculation of the elements in va and vb in excess
-    int dataInExcess = (VECTOR_SIZE)%(sizeof(__m256)/sizeof(float));
-
-    // Surplus data can be processed sequentially
-    
-    for (int i =0; i< dataInExcess; i++){
-        *(c + 2 * ITEMS_PER_PACKET + i) = *(a + 2 * ITEMS_PER_PACKET + i) + *(b + 2 * ITEMS_PER_PACKET + i);
-    }
-    
-    // Print resulting data from array addition
-    for (int i = 0; i < VECTOR_SIZE; i++) {
-        printf("\nc[%d]: %f", i, *(c + i));
+	CImg<data_t> srcImage;
+	// Cargar imagen fuente - Controlando si existe
+	try {
+    	srcImage = CImg<data_t>(SOURCE_IMG);
+	} catch (CImgException& e) {
+		fprintf(stderr, "ERROR: la imagen '%s' no existe.\n", SOURCE_IMG);
+		exit(EXIT_FAILURE);
 	}
-  
-    // Free memory allocated using _mm_malloc
-    // It has to be freed with _mm_free
-    _mm_free(c);
+
+	filter_args_t filter_args;
+	data_t *pDstImage; // Pointer to the new image pixels
+
+
+	/***************************************************
+	 *   - Prepare variables for the algorithm
+	 *   - This is not included in the benchmark time
+	 */
+	struct timespec tStart, tEnd; // Variables for time measurement
+	double elapsedTime;     // Elapsed time in seconds
+
+	srcImage.display(); // Displays the source image
+	uint width = srcImage.width();// Getting information from the source image
+	uint height = srcImage.height();	
+	uint nComp = srcImage.spectrum();// source image number of components
+	         // Common values for spectrum (number of image components):
+				//  B&W images = 1
+				//	Normal color images = 3 (RGB)
+				//  Special color images = 4 (RGB and alpha/transparency channel)
+
+	// Calculating image size in pixels
+	filter_args.pixelCount = width * height;
+	
+	// Allocate memory space for destination image components (aligned to 32 bytes)
+	pDstImage = (data_t *) _mm_malloc (filter_args.pixelCount * nComp * sizeof(data_t), 32);
+	if (pDstImage == NULL) {
+		perror("Allocating destination image");
+		exit(-2);
+	}
+
+	// Pointers to the componet arrays of the source image
+	filter_args.pRsrc = srcImage.data(); // pRcomp points to the R component array
+	filter_args.pGsrc = filter_args.pRsrc + filter_args.pixelCount; // pGcomp points to the G component array
+	filter_args.pBsrc = filter_args.pGsrc + filter_args.pixelCount; // pBcomp points to B component array
+	
+	// Pointers to the RGB arrays of the destination image
+	filter_args.pRdst = pDstImage;
+	filter_args.pGdst = filter_args.pRdst + filter_args.pixelCount;
+	filter_args.pBdst = filter_args.pGdst + filter_args.pixelCount;
+
+
+	/***********************************************
+	 *   - Measure initial time
+	 */
+	if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
+		printf("Error al obtener el tiempo inicial");
+		exit(EXIT_FAILURE);
+	}
+
+
+	/************************************************
+	 * Algorithm.
+	 */
+	for (int i = 0; i < N_ITERATIONS; i++){
+		filter(filter_args);
+	}
+
+
+	/***********************************************
+	 *   - Measure the end time
+	 *   - Calculate the elapsed time
+	 */
+	if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
+		printf("Error al obtener el tiempo final");
+		exit(EXIT_FAILURE);
+	}
+	elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
+	printf("Elapsed time (%d repetitions): %.6f seconds\n", N_ITERATIONS, elapsedTime);
+
+		
+	// Create a new image object with the calculated pixels
+	// In case of normal color images use nComp=3,
+	// In case of B/W images use nComp=1.
+	CImg<data_t> dstImage(pDstImage, width, height, 1, nComp);
+
+	if (static_cast<unsigned int>(dstImage.width()) != width || 
+		static_cast<unsigned int>(dstImage.height()) != height || 
+		static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
+		fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
+		_mm_free(pDstImage);
+		exit(EXIT_FAILURE);
+	}
+
+	// Store destination image in disk
+	dstImage.save(DESTINATION_IMG); 
+
+	// Display destination image
+	dstImage.display();
+	
+	// Free memory
+	_mm_free(pDstImage);
 
 	return 0;
 }
