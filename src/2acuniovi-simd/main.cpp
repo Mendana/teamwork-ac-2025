@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <immintrin.h>
 #include <math.h>
 #include <time.h>
 #include <CImg.h>
