@@ -56,37 +56,47 @@ typedef struct {
  * *********************************************/
 void filter (filter_args_t args) {
 	// 
-	simd_t r_weight = _mm256_set1_pd(R_WEIGHT);
-	simd_t g_weight = _mm256_set1_pd(G_WEIGHT);
-	simd_t b_weight = _mm256_set1_pd(B_WEIGHT);
-	simd_t max_brightness = _mm256_set1_pd(MAX_BRIGHTNESS);
+	const simd_t r_weight = _mm256_set1_pd(R_WEIGHT);
+	const simd_t g_weight = _mm256_set1_pd(G_WEIGHT);
+	const simd_t b_weight = _mm256_set1_pd(B_WEIGHT);
+	const simd_t max_brightness = _mm256_set1_pd(MAX_BRIGHTNESS);
 
 	// Calculation of the size of the resulting array
-    uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
+    const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
 
 	// 32 bytes (256 bits) packets. Used to stored aligned memory data
     simd_t vr, vg, vb, L; 
 
 	// Main loop with SIMD instructions
 	for(uint i = 0; i < nPackets; i++){
-		uint pos = i * ITEMS_PER_PACKET;
+		const uint pos = i * ITEMS_PER_PACKET;
 
 		vr = _mm256_loadu_pd(args.pRsrc + pos);
 		vg = _mm256_loadu_pd(args.pGsrc + pos);
 		vb = _mm256_loadu_pd(args.pBsrc + pos);
 
-		vr = _mm256_mul_pd(vr, r_weight);
-		vg = _mm256_mul_pd(vg, g_weight);
-		vb = _mm256_mul_pd(vb, b_weight);
 
-		L = _mm256_add_pd(vr, vg);
-		L = _mm256_add_pd(L, vb);
+		// vr = _mm256_mul_pd(vr, r_weight);
+		// vg = _mm256_mul_pd(vg, g_weight);
+		// vb = _mm256_mul_pd(vb, b_weight);
+		// L = _mm256_add_pd(vr, vg);
+		// L = _mm256_add_pd(L, vb);
+
+		L = _mm256_mul_pd(vr, r_weight);
+		L = _mm256_fmadd_pd(vg, g_weight, L);
+		L = _mm256_fmadd_pd(vb, b_weight, L);
+
+
 
 		L = _mm256_sub_pd(max_brightness, L);
 
-		*(simd_t*)(args.pRdst + pos) = L;
-		*(simd_t*)(args.pGdst + pos) = L;
-		*(simd_t*)(args.pBdst + pos) = L;
+		// *(simd_t*)(args.pRdst + pos) = L;
+		// *(simd_t*)(args.pGdst + pos) = L;
+		// *(simd_t*)(args.pBdst + pos) = L;
+
+		_mm256_storeu_pd(args.pRdst + pos, L);
+		_mm256_storeu_pd(args.pGdst + pos, L);
+		_mm256_storeu_pd(args.pBdst + pos, L);
 	}
 	
 	// Calculation of the remaining data, not enough items to use SIMD
