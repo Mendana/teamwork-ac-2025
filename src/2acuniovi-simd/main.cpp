@@ -81,14 +81,14 @@ void filter (filter_args_t args) {
 
 		L = _mm256_sub_pd(max_brightness, L);
 
-		*(simd_t*)(args.pRdst + pos) = L;
-		*(simd_t*)(args.pGdst + pos) = L;
-		*(simd_t*)(args.pBdst + pos) = L;
+		// *(simd_t*)(args.pRdst + pos) = L;
+		// *(simd_t*)(args.pGdst + pos) = L;
+		// *(simd_t*)(args.pBdst + pos) = L;
 
 		//Debería ser mejor esto que los punteros, pero creemos que está virtualizando por tener AMD o algo similar
-		// _mm256_storeu_pd(args.pRdst + pos, L);
-		// _mm256_storeu_pd(args.pGdst + pos, L);
-		// _mm256_storeu_pd(args.pBdst + pos, L);
+		_mm256_storeu_pd(args.pRdst + pos, L);
+		_mm256_storeu_pd(args.pGdst + pos, L);
+		_mm256_storeu_pd(args.pBdst + pos, L);
 	}
 	
 	// Calculation of the remaining data, not enough items to use SIMD
