@@ -22,12 +22,12 @@ using namespace cimg_library;
 
 // Data type for image components
 typedef double data_t;
-typedef __m256d simd_t;
+typedef __m128d simd_t; 
 
 const char* SOURCE_IMG      = "bailarina.bmp";
 const char* DESTINATION_IMG = "bailarina2.bmp";
 
-// Filter argument data type
+// Filter argument data type<
 typedef struct {
 	data_t *pRsrc; // Pointers to the R, G and B components
 	data_t *pGsrc;
@@ -55,43 +55,31 @@ typedef struct {
  * 		
  * *********************************************/
 void filter (filter_args_t args) {
-	// 
-	const simd_t r_weight = _mm256_set1_pd(R_WEIGHT);
-	const simd_t g_weight = _mm256_set1_pd(G_WEIGHT);
-	const simd_t b_weight = _mm256_set1_pd(B_WEIGHT);
-	const simd_t max_brightness = _mm256_set1_pd(MAX_BRIGHTNESS);
+	const simd_t r_weight = _mm_set1_pd(R_WEIGHT);
+	const simd_t g_weight = _mm_set1_pd(G_WEIGHT);
+	const simd_t b_weight = _mm_set1_pd(B_WEIGHT);
+	const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
 
-	// Calculation of the size of the resulting array
-    const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
+	const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
+	simd_t vr, vg, vb, L;
 
-	// 32 bytes (256 bits) packets. Used to stored aligned memory data
-    simd_t vr, vg, vb, L; 
-
-	// Main loop with SIMD instructions
 	for(uint i = 0; i < nPackets; i++){
 		const uint pos = i * ITEMS_PER_PACKET;
 
-		vr = _mm256_loadu_pd(args.pRsrc + pos);
-		vg = _mm256_loadu_pd(args.pGsrc + pos);
-		vb = _mm256_loadu_pd(args.pBsrc + pos);
+		vr = _mm_loadu_pd(args.pRsrc + pos);
+		vg = _mm_loadu_pd(args.pGsrc + pos);
+		vb = _mm_loadu_pd(args.pBsrc + pos);
 
-		L = _mm256_mul_pd(vr, r_weight);
-		L = _mm256_fmadd_pd(vg, g_weight, L);
-		L = _mm256_fmadd_pd(vb, b_weight, L);
+		L = _mm_mul_pd(vr, r_weight);
+		L = _mm_fmadd_pd(vg, g_weight, L);
+		L = _mm_fmadd_pd(vb, b_weight, L);
+		L = _mm_sub_pd(max_brightness, L);
 
-		L = _mm256_sub_pd(max_brightness, L);
-
-		// *(simd_t*)(args.pRdst + pos) = L;
-		// *(simd_t*)(args.pGdst + pos) = L;
-		// *(simd_t*)(args.pBdst + pos) = L;
-
-		//Debería ser mejor esto que los punteros, pero creemos que está virtualizando por tener AMD o algo similar
-		_mm256_storeu_pd(args.pRdst + pos, L);
-		_mm256_storeu_pd(args.pGdst + pos, L);
-		_mm256_storeu_pd(args.pBdst + pos, L);
+		*(simd_t*)(args.pRdst + pos) = L;
+		*(simd_t*)(args.pGdst + pos) = L;
+		*(simd_t*)(args.pBdst + pos) = L;
 	}
-	
-	// Calculation of the remaining data, not enough items to use SIMD
+
 	for (uint i = nPackets * ITEMS_PER_PACKET; i < args.pixelCount; i++){
 		data_t L = *(args.pRsrc + i) * R_WEIGHT + 
 				*(args.pGsrc + i) * G_WEIGHT + 
@@ -138,8 +126,9 @@ int main() {
 	// Calculating image size in pixels
 	filter_args.pixelCount = width * height;
 	
-	// Allocate memory space for destination image components (aligned to 32 bytes)
-	pDstImage = (data_t *) _mm_malloc (filter_args.pixelCount * nComp * sizeof(data_t), 32);
+	// CAMBIO: Alineamiento a 16 bytes (128 bits) en lugar de 32
+	uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
+	pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
 	if (pDstImage == NULL) {
 		perror("Allocating destination image");
 		exit(-2);
@@ -152,15 +141,15 @@ int main() {
 	
 	// Pointers to the RGB arrays of the destination image
 	filter_args.pRdst = pDstImage;
-	filter_args.pGdst = filter_args.pRdst + filter_args.pixelCount;
-	filter_args.pBdst = filter_args.pGdst + filter_args.pixelCount;
+	filter_args.pGdst = filter_args.pRdst + pixelCountAligned;
+	filter_args.pBdst = filter_args.pGdst + pixelCountAligned;
 
 
 	/***********************************************
 	 *   - Measure initial time
 	 */
 	if(clock_gettime(CLOCK_REALTIME, &tStart) == -1) {
-		printf("Error al obtener el tiempo inicial");
+		perror("Error al obtener el tiempo inicial");
 		exit(EXIT_FAILURE);
 	}
 
@@ -178,7 +167,7 @@ int main() {
 	 *   - Calculate the elapsed time
 	 */
 	if(clock_gettime(CLOCK_REALTIME, &tEnd) == -1){
-		printf("Error al obtener el tiempo final");
+		perror("Error al obtener el tiempo final");
 		exit(EXIT_FAILURE);
 	}
 	elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
