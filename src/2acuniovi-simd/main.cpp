@@ -71,9 +71,17 @@ void filter (filter_args_t args) {
 	for(uint i = 0; i < nPackets; i++){
 		const uint pos = i * ITEMS_PER_PACKET;
 
-		vr = _mm256_load_pd(args.pRsrc + pos);
+
+		// Elegir una de las dos siguientes opciones: (la que vaya mas rapido) 
+		//////////////////////////////////////////////////////
+		vr = _mm256_load_pd(args.pRsrc + pos);				
 		vg = _mm256_load_pd(args.pGsrc + pos);
 		vb = _mm256_load_pd(args.pBsrc + pos);
+		/////////////////////////////////////////////////////
+		//vr = _mm256_loadu_pd(args.pRsrc + pos);			/
+		//vg = _mm256_loadu_pd(args.pGsrc + pos);			/
+		//vb = _mm256_loadu_pd(args.pBsrc + pos);			/
+		/////////////////////////////////////////////////////
 
 		L = _mm256_mul_pd(vr, r_weight);
 		L = _mm256_fmadd_pd(vg, g_weight, L);
@@ -81,9 +89,16 @@ void filter (filter_args_t args) {
 
 		L = _mm256_sub_pd(max_brightness, L);
 
+		// Elegir una de las dos siguientes opciones: (la que vaya mas rapido) 
+		//////////////////////////////////////////////////////
 		_mm256_stream_pd(args.pRdst + pos, L);
 		_mm256_stream_pd(args.pGdst + pos, L);
 		_mm256_stream_pd(args.pBdst + pos, L);
+		/////////////////////////////////////////////////////
+		//*(simd_t*)(args.pRdst + pos) = L;					/
+		//*(simd_t*)(args.pGdst + pos) = L;					/
+		//*(simd_t*)(args.pBdst + pos) = L;					/
+		/////////////////////////////////////////////////////
 	}
 
 	// Puede ser necesaria la siguiente linea si hay datos corruptos (en principio no deberia):
