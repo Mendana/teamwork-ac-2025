@@ -65,15 +65,15 @@ void filter (filter_args_t args) {
     const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
 
 	// 32 bytes (256 bits) packets. Used to stored aligned memory data
-    simd_t vr, vg, vb, L; 
+    simd_t vr, vg, vb, L;
 
 	// Main loop with SIMD instructions
 	for(uint i = 0; i < nPackets; i++){
 		const uint pos = i * ITEMS_PER_PACKET;
 
-		vr = _mm256_loadu_pd(args.pRsrc + pos);
-		vg = _mm256_loadu_pd(args.pGsrc + pos);
-		vb = _mm256_loadu_pd(args.pBsrc + pos);
+		vr = _mm256_load_pd(args.pRsrc + pos);
+		vg = _mm256_load_pd(args.pGsrc + pos);
+		vb = _mm256_load_pd(args.pBsrc + pos);
 
 		L = _mm256_mul_pd(vr, r_weight);
 		L = _mm256_fmadd_pd(vg, g_weight, L);
@@ -81,15 +81,13 @@ void filter (filter_args_t args) {
 
 		L = _mm256_sub_pd(max_brightness, L);
 
-		*(simd_t*)(args.pRdst + pos) = L;
-		*(simd_t*)(args.pGdst + pos) = L;
-		*(simd_t*)(args.pBdst + pos) = L;
-
-		//Debería ser mejor esto que los punteros, pero creemos que está virtualizando por tener AMD o algo similar
-		// _mm256_storeu_pd(args.pRdst + pos, L);
-		// _mm256_storeu_pd(args.pGdst + pos, L);
-		// _mm256_storeu_pd(args.pBdst + pos, L);
+		_mm256_stream_pd(args.pRdst + pos, L);
+		_mm256_stream_pd(args.pGdst + pos, L);
+		_mm256_stream_pd(args.pBdst + pos, L);
 	}
+
+	// Puede ser necesaria la siguiente linea si hay datos corruptos (en principio no deberia):
+	//_mm_sfence();
 	
 	// Calculation of the remaining data, not enough items to use SIMD
 	for (uint i = nPackets * ITEMS_PER_PACKET; i < args.pixelCount; i++){
