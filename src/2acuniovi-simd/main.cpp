@@ -65,18 +65,18 @@ void filter (filter_args_t args) {
 	for(uint i = 0; i < nPackets; i++){
 		const uint pos = i * ITEMS_PER_PACKET;
 
-		const simd_t vr = _mm_load_pd(args.pRsrc + pos);
-		const simd_t vg = _mm_load_pd(args.pGsrc + pos);
-		const simd_t vb = _mm_load_pd(args.pBsrc + pos);
+		const simd_t vr = _mm_loadu_pd(args.pRsrc + pos);
+		const simd_t vg = _mm_loadu_pd(args.pGsrc + pos);
+		const simd_t vb = _mm_loadu_pd(args.pBsrc + pos);
 
 		simd_t L = _mm_mul_pd(vr, r_weight);
 		L = _mm_add_pd(L, _mm_mul_pd(g_weight, vg));
 		L = _mm_add_pd(L, _mm_mul_pd(b_weight, vb));
 		L = _mm_sub_pd(max_brightness, L);
 
-		_mm_stream_pd(args.pRdst + pos, L);
-		_mm_stream_pd(args.pGdst + pos, L);
-		_mm_stream_pd(args.pBdst + pos, L);
+		_mm_storeu_pd(args.pRdst + pos, L);
+		_mm_storeu_pd(args.pGdst + pos, L);
+		_mm_storeu_pd(args.pBdst + pos, L);
 	}
 
 	for (uint i = nPackets * ITEMS_PER_PACKET; i < args.pixelCount; i++){
@@ -125,34 +125,22 @@ int main() {
 	// Calculating image size in pixels
 	filter_args.pixelCount = width * height;
 	
-	// CAMBIO: Alineamiento a 16 bytes (128 bits) en lugar de 32
-	uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
-	
-	// Allocar memoria alineada para origen y destino
-	data_t *pSrcImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
-	pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
+	// Allocate memory space for destination image components
+	pDstImage = (data_t *) malloc (filter_args.pixelCount * nComp * sizeof(data_t));
 	if (pDstImage == NULL) {
 		perror("Allocating destination image");
 		exit(-2);
 	}
 
-	// Copiar datos de CImg a memoria alineada
-	data_t *pCImgData = srcImage.data();
-	for (uint c = 0; c < nComp; c++) {
-		for (uint i = 0; i < filter_args.pixelCount; i++) {
-			pSrcImage[c * pixelCountAligned + i] = pCImgData[c * filter_args.pixelCount + i];
-		}
-	}
-
-	// Pointers to the component arrays of the source image (ahora alineados)
-	filter_args.pRsrc = pSrcImage;
-	filter_args.pGsrc = filter_args.pRsrc + pixelCountAligned;
-	filter_args.pBsrc = filter_args.pGsrc + pixelCountAligned;
+	// Pointers to the component arrays of the source image
+	filter_args.pRsrc = srcImage.data();
+	filter_args.pGsrc = filter_args.pRsrc + filter_args.pixelCount;
+	filter_args.pBsrc = filter_args.pGsrc + filter_args.pixelCount;
 	
 	// Pointers to the RGB arrays of the destination image
 	filter_args.pRdst = pDstImage;
-	filter_args.pGdst = filter_args.pRdst + pixelCountAligned;
-	filter_args.pBdst = filter_args.pGdst + pixelCountAligned;
+	filter_args.pGdst = filter_args.pRdst + filter_args.pixelCount;
+	filter_args.pBdst = filter_args.pGdst + filter_args.pixelCount;
 
 
 	/***********************************************
@@ -205,8 +193,7 @@ int main() {
 	dstImage.display();
 	
 	// Free memory
-	_mm_free(pSrcImage);
-	_mm_free(pDstImage);
+	free(pDstImage);
 
 	return 0;
 }
