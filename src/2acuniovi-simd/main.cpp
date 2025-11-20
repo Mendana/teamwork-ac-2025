@@ -66,19 +66,18 @@ void filter (filter_args_t args) {
 	for(uint i = 0; i < nPackets; i++){
 		const uint pos = i * ITEMS_PER_PACKET;
 
-		vr = _mm_loadu_pd(args.pRsrc + pos);
-		vg = _mm_loadu_pd(args.pGsrc + pos);
-		vb = _mm_loadu_pd(args.pBsrc + pos);
+		vr = _mm_load_pd(args.pRsrc + pos);
+		vg = _mm_load_pd(args.pGsrc + pos);
+		vb = _mm_load_pd(args.pBsrc + pos);
 
 		L = _mm_mul_pd(vr, r_weight);
 		L = _mm_add_pd(L, _mm_mul_pd(g_weight, vg));
 		L = _mm_add_pd(L, _mm_mul_pd(b_weight, vb));
 		L = _mm_sub_pd(max_brightness, L);
 
-
-		*(simd_t*)(args.pRdst + pos) = L;
-		*(simd_t*)(args.pGdst + pos) = L;
-		*(simd_t*)(args.pBdst + pos) = L;
+		_mm_stream_pd(args.pRdst + pos, L);
+		_mm_stream_pd(args.pGdst + pos, L);
+		_mm_stream_pd(args.pBdst + pos, L);
 	}
 
 	for (uint i = nPackets * ITEMS_PER_PACKET; i < args.pixelCount; i++){
@@ -129,16 +128,27 @@ int main() {
 	
 	// CAMBIO: Alineamiento a 16 bytes (128 bits) en lugar de 32
 	uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
+	
+	// Allocar memoria alineada para origen y destino
+	data_t *pSrcImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
 	pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
 	if (pDstImage == NULL) {
 		perror("Allocating destination image");
 		exit(-2);
 	}
 
-	// Pointers to the componet arrays of the source image
-	filter_args.pRsrc = srcImage.data(); // pRcomp points to the R component array
-	filter_args.pGsrc = filter_args.pRsrc + filter_args.pixelCount; // pGcomp points to the G component array
-	filter_args.pBsrc = filter_args.pGsrc + filter_args.pixelCount; // pBcomp points to B component array
+	// Copiar datos de CImg a memoria alineada
+	data_t *pCImgData = srcImage.data();
+	for (uint c = 0; c < nComp; c++) {
+		for (uint i = 0; i < filter_args.pixelCount; i++) {
+			pSrcImage[c * pixelCountAligned + i] = pCImgData[c * filter_args.pixelCount + i];
+		}
+	}
+
+	// Pointers to the component arrays of the source image (ahora alineados)
+	filter_args.pRsrc = pSrcImage;
+	filter_args.pGsrc = filter_args.pRsrc + pixelCountAligned;
+	filter_args.pBsrc = filter_args.pGsrc + pixelCountAligned;
 	
 	// Pointers to the RGB arrays of the destination image
 	filter_args.pRdst = pDstImage;
@@ -184,6 +194,7 @@ int main() {
 		static_cast<unsigned int>(dstImage.height()) != height || 
 		static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
 		fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
+		_mm_free(pSrcImage);
 		_mm_free(pDstImage);
 		exit(EXIT_FAILURE);
 	}
@@ -195,6 +206,7 @@ int main() {
 	dstImage.display();
 	
 	// Free memory
+	_mm_free(pSrcImage);
 	_mm_free(pDstImage);
 
 	return 0;
