@@ -61,16 +61,15 @@ void filter (filter_args_t args) {
 	const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
 
 	const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
-	simd_t vr, vg, vb, L;
 
 	for(uint i = 0; i < nPackets; i++){
 		const uint pos = i * ITEMS_PER_PACKET;
 
-		vr = _mm_load_pd(args.pRsrc + pos);
-		vg = _mm_load_pd(args.pGsrc + pos);
-		vb = _mm_load_pd(args.pBsrc + pos);
+		const simd_t vr = _mm_load_pd(args.pRsrc + pos);
+		const simd_t vg = _mm_load_pd(args.pGsrc + pos);
+		const simd_t vb = _mm_load_pd(args.pBsrc + pos);
 
-		L = _mm_mul_pd(vr, r_weight);
+		simd_t L = _mm_mul_pd(vr, r_weight);
 		L = _mm_add_pd(L, _mm_mul_pd(g_weight, vg));
 		L = _mm_add_pd(L, _mm_mul_pd(b_weight, vb));
 		L = _mm_sub_pd(max_brightness, L);
