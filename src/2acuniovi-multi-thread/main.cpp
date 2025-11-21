@@ -68,21 +68,71 @@ typedef struct {
  * 		
  * *********************************************/
 void* thread_filter(void* args){
-	thread_args_t* tArgs = (thread_args_t*) args;
-	for(uint iter = 0; iter < tArgs->iteration;iter++){
-		for (uint i = tArgs->start; i < tArgs->end; i++) {
-			data_t L = *(tArgs->pRsrc + i) * R_WEIGHT + 
-				   *(tArgs->pGsrc + i) * G_WEIGHT + 
-				   *(tArgs->pBsrc + i) * B_WEIGHT;
-
-		L = MAX_BRIGHTNESS - L;
-
-		*(tArgs->pRdst + i) = L;
-		*(tArgs->pGdst + i) = L;
-		*(tArgs->pBdst + i) = L;
-		}
-	}
-	pthread_exit(NULL);
+    thread_args_t* tArgs = (thread_args_t*) args;
+    
+    data_t *pR_base = tArgs->pRsrc + tArgs->start;
+    data_t *pG_base = tArgs->pGsrc + tArgs->start;
+    data_t *pB_base = tArgs->pBsrc + tArgs->start;
+    data_t *pRdst_base = tArgs->pRdst + tArgs->start;
+    data_t *pGdst_base = tArgs->pGdst + tArgs->start;
+    data_t *pBdst_base = tArgs->pBdst + tArgs->start;
+    
+    uint length = tArgs->end - tArgs->start;
+    uint length_unroll = (length / 4) * 4; // Múltiplo de 4 para unrolling
+    
+    for(uint iter = 0; iter < tArgs->iteration; iter++){
+        // Reiniciar punteros para cada iteración
+        data_t *pR = pR_base;
+        data_t *pG = pG_base;
+        data_t *pB = pB_base;
+        data_t *pRdst = pRdst_base;
+        data_t *pGdst = pGdst_base;
+        data_t *pBdst = pBdst_base;
+        
+        // Procesar 4 píxeles por iteración (loop unrolling)
+        for (uint i = 0; i < length_unroll; i += 4) {
+            // Píxel 0
+            data_t L0 = MAX_BRIGHTNESS - (pR[0] * R_WEIGHT + pG[0] * G_WEIGHT + pB[0] * B_WEIGHT);
+            pRdst[0] = L0;
+            pGdst[0] = L0;
+            pBdst[0] = L0;
+            
+            // Píxel 1
+            data_t L1 = MAX_BRIGHTNESS - (pR[1] * R_WEIGHT + pG[1] * G_WEIGHT + pB[1] * B_WEIGHT);
+            pRdst[1] = L1;
+            pGdst[1] = L1;
+            pBdst[1] = L1;
+            
+            // Píxel 2
+            data_t L2 = MAX_BRIGHTNESS - (pR[2] * R_WEIGHT + pG[2] * G_WEIGHT + pB[2] * B_WEIGHT);
+            pRdst[2] = L2;
+            pGdst[2] = L2;
+            pBdst[2] = L2;
+            
+            // Píxel 3
+            data_t L3 = MAX_BRIGHTNESS - (pR[3] * R_WEIGHT + pG[3] * G_WEIGHT + pB[3] * B_WEIGHT);
+            pRdst[3] = L3;
+            pGdst[3] = L3;
+            pBdst[3] = L3;
+            
+            // Avanzar punteros 4 posiciones
+            pR += 4;
+            pG += 4;
+            pB += 4;
+            pRdst += 4;
+            pGdst += 4;
+            pBdst += 4;
+        }
+        
+        // Procesar píxeles restantes
+        for (uint i = length_unroll; i < length; i++) {
+            data_t L = MAX_BRIGHTNESS - (*pR++ * R_WEIGHT + *pG++ * G_WEIGHT + *pB++ * B_WEIGHT);
+            *pRdst++ = L;
+            *pGdst++ = L;
+            *pBdst++ = L;
+        }
+    }
+    pthread_exit(NULL);
 }
 
 /***********************************************
