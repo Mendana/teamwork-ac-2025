@@ -29,19 +29,6 @@ typedef double data_t;
 const char* SOURCE_IMG      = "bailarina.bmp";
 const char* DESTINATION_IMG = "bailarina2.bmp";
 
-pthread_barrier_t barrier_start; 
-pthread_barrier_t barrier_end; 
-volatile bool keep_running = true; 
-int current_iteration = 0;
-
-// Structure used by each thread to know which part of the image to process.
-typedef struct {
-    data_t *pRsrc, *pGsrc, *pBsrc;
-    data_t *pRdst, *pGdst, *pBdst;
-    uint start, end;
-	uint iteration;
-} thread_args_t;
-
 // Filter argument data type
 typedef struct {
 	data_t *pRsrc; // Pointers to the R, G and B components
@@ -51,6 +38,7 @@ typedef struct {
 	data_t *pGdst;
 	data_t *pBdst;
 	uint pixelCount; // Size of the image in pixels
+	uint start, end; // Thread-specific pixel range
 } filter_args_t;
 
 /***********************************************
@@ -68,69 +56,25 @@ typedef struct {
  * 		
  * *********************************************/
 void* thread_filter(void* args){
-    thread_args_t* tArgs = (thread_args_t*) args;
+    filter_args_t* tArgs = (filter_args_t*) args;
     
-    data_t *pR_base = tArgs->pRsrc + tArgs->start;
-    data_t *pG_base = tArgs->pGsrc + tArgs->start;
-    data_t *pB_base = tArgs->pBsrc + tArgs->start;
-    data_t *pRdst_base = tArgs->pRdst + tArgs->start;
-    data_t *pGdst_base = tArgs->pGdst + tArgs->start;
-    data_t *pBdst_base = tArgs->pBdst + tArgs->start;
+    data_t *pR = tArgs->pRsrc + tArgs->start;
+    data_t *pG = tArgs->pGsrc + tArgs->start;
+    data_t *pB = tArgs->pBsrc + tArgs->start;
+    data_t *pRdst = tArgs->pRdst + tArgs->start;
+    data_t *pGdst = tArgs->pGdst + tArgs->start;
+    data_t *pBdst = tArgs->pBdst + tArgs->start;
     
     uint length = tArgs->end - tArgs->start;
-    uint length_unroll = (length / 4) * 4; // Múltiplo de 4 para unrolling
     
-    for(uint iter = 0; iter < tArgs->iteration; iter++){
-        data_t *pR = pR_base;
-        data_t *pG = pG_base;
-        data_t *pB = pB_base;
-        data_t *pRdst = pRdst_base;
-        data_t *pGdst = pGdst_base;
-        data_t *pBdst = pBdst_base;
-        
-        // Procesar 4 píxeles por iteración
-        for (uint i = 0; i < length_unroll; i += 4) {
-            // Píxel 0
-            data_t L0 = MAX_BRIGHTNESS - (pR[0] * R_WEIGHT + pG[0] * G_WEIGHT + pB[0] * B_WEIGHT);
-            pRdst[0] = L0;
-            pGdst[0] = L0;
-            pBdst[0] = L0;
-            
-            // Píxel 1
-            data_t L1 = MAX_BRIGHTNESS - (pR[1] * R_WEIGHT + pG[1] * G_WEIGHT + pB[1] * B_WEIGHT);
-            pRdst[1] = L1;
-            pGdst[1] = L1;
-            pBdst[1] = L1;
-            
-            // Píxel 2
-            data_t L2 = MAX_BRIGHTNESS - (pR[2] * R_WEIGHT + pG[2] * G_WEIGHT + pB[2] * B_WEIGHT);
-            pRdst[2] = L2;
-            pGdst[2] = L2;
-            pBdst[2] = L2;
-            
-            // Píxel 3
-            data_t L3 = MAX_BRIGHTNESS - (pR[3] * R_WEIGHT + pG[3] * G_WEIGHT + pB[3] * B_WEIGHT);
-            pRdst[3] = L3;
-            pGdst[3] = L3;
-            pBdst[3] = L3;
-            
-            // Avanzar punteros 4 posiciones
-            pR += 4;
-            pG += 4;
-            pB += 4;
-            pRdst += 4;
-            pGdst += 4;
-            pBdst += 4;
-        }
-        
-        // Procesar píxeles restantes
-        for (uint i = length_unroll; i < length; i++) {
-            data_t L = MAX_BRIGHTNESS - (*pR++ * R_WEIGHT + *pG++ * G_WEIGHT + *pB++ * B_WEIGHT);
-            *pRdst++ = L;
-            *pGdst++ = L;
-            *pBdst++ = L;
-        }
+    // Process this thread's portion of the image
+    for (uint i = 0; i < length; i++) {
+        data_t L = MAX_BRIGHTNESS - (pR[i] * R_WEIGHT + pG[i] * G_WEIGHT + pB[i] * B_WEIGHT);
+        pRdst[i] = L;
+        pGdst[i] = L;
+        pBdst[i] = L;
     }
+    
     pthread_exit(NULL);
 }
 
@@ -138,35 +82,21 @@ void* thread_filter(void* args){
  * Multithreaded filter execution
  * Creates threads, distributes work, and waits for completion
  * *********************************************/
-void execute_multithreaded_filter(filter_args_t filter_args, uint pixelsPerThread) {
+void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThread) {
 	pthread_t threads[NUM_THREADS];
-	thread_args_t thread_args[NUM_THREADS];
-
-	uint iterationsPerThread = N_ITERATIONS / NUM_THREADS;
-	uint remainingIterations = N_ITERATIONS % NUM_THREADS;
+	filter_args_t thread_args[NUM_THREADS];
 	
 	// Prepare thread arguments and create threads
 	for (uint t = 0; t < NUM_THREADS; t++) {
-		thread_args[t].pRsrc = filter_args.pRsrc;
-		thread_args[t].pGsrc = filter_args.pGsrc;
-		thread_args[t].pBsrc = filter_args.pBsrc;
-		thread_args[t].pRdst = filter_args.pRdst;
-		thread_args[t].pGdst = filter_args.pGdst;
-		thread_args[t].pBdst = filter_args.pBdst;
-		thread_args[t].iteration = (t < remainingIterations) ?
-		iterationsPerThread + 1 : iterationsPerThread;
+		thread_args[t] = *filter_args;
 		
 		// Calculate start and end pixels for this thread
 		thread_args[t].start = t * pixelsPerThread;
 		// Last thread processes remaining pixels
-		if (t == NUM_THREADS - 1) {
-			thread_args[t].end = filter_args.pixelCount;
-		} else {
-			thread_args[t].end = (t + 1) * pixelsPerThread;
-		}
+		thread_args[t].end = (t == NUM_THREADS - 1) ? filter_args->pixelCount : (t + 1) * pixelsPerThread;
 		
-		if(pthread_create(&threads[t],NULL,thread_filter, &thread_args[t])!=0){
-			fprintf(stderr,"Error creating thread");
+		if(pthread_create(&threads[t], NULL, thread_filter, &thread_args[t]) != 0){
+			fprintf(stderr, "Error creating thread");
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -244,7 +174,9 @@ int main() {
 	 * Algorithm - Multithreaded version
 	 */
 	
-		execute_multithreaded_filter(filter_args, pixelsPerThread);
+	for (uint iter = 0; iter < N_ITERATIONS; iter++) {
+		execute_multithreaded_filter(&filter_args, pixelsPerThread);
+	}
 
 
 	/***********************************************
