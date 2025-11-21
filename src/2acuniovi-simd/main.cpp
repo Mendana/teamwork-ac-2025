@@ -71,8 +71,8 @@ void filter (filter_args_t args) {
 		vb = _mm_loadu_pd(args.pBsrc + pos);
 
 		L = _mm_mul_pd(vr, r_weight);
-		L = _mm_add_pd(L,	_mm_mul_pd(g_weight, L));
-		L = _mm_add_pd(L, _mm_mul_pd(b_weight, L));
+		L = _mm_fmadd_pd(vg, g_weight, L);
+		L = _mm_fmadd_pd(vb, b_weight, L);
 		L = _mm_sub_pd(max_brightness, L);
 
 		*(simd_t*)(args.pRdst + pos) = L;
