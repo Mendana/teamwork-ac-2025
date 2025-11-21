@@ -75,6 +75,7 @@ void filter (filter_args_t args) {
 		L = _mm_fmadd_pd(vb, b_weight, L);
 		L = _mm_sub_pd(max_brightness, L);
 
+
 		*(simd_t*)(args.pRdst + pos) = L;
 		*(simd_t*)(args.pGdst + pos) = L;
 		*(simd_t*)(args.pBdst + pos) = L;
