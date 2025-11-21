@@ -16,7 +16,7 @@
 
 
 
-#define NUM_THREADS 6
+#define NUM_THREADS 8
 
 //Number of iterations of the filter so it reaches the required time
 #define N_ITERATIONS 125
