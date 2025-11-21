@@ -81,7 +81,6 @@ void* thread_filter(void* args){
     uint length_unroll = (length / 4) * 4; // Múltiplo de 4 para unrolling
     
     for(uint iter = 0; iter < tArgs->iteration; iter++){
-        // Reiniciar punteros para cada iteración
         data_t *pR = pR_base;
         data_t *pG = pG_base;
         data_t *pB = pB_base;
@@ -89,7 +88,7 @@ void* thread_filter(void* args){
         data_t *pGdst = pGdst_base;
         data_t *pBdst = pBdst_base;
         
-        // Procesar 4 píxeles por iteración (loop unrolling)
+        // Procesar 4 píxeles por iteración
         for (uint i = 0; i < length_unroll; i += 4) {
             // Píxel 0
             data_t L0 = MAX_BRIGHTNESS - (pR[0] * R_WEIGHT + pG[0] * G_WEIGHT + pB[0] * B_WEIGHT);
@@ -142,16 +141,20 @@ void* thread_filter(void* args){
 void execute_multithreaded_filter(filter_args_t filter_args, uint pixelsPerThread) {
 	pthread_t threads[NUM_THREADS];
 	thread_args_t thread_args[NUM_THREADS];
+
+	uint iterationsPerThread = N_ITERATIONS / NUM_THREADS;
+	uint remainingIterations = N_ITERATIONS % NUM_THREADS;
 	
 	// Prepare thread arguments and create threads
-	for (int t = 0; t < NUM_THREADS; t++) {
+	for (uint t = 0; t < NUM_THREADS; t++) {
 		thread_args[t].pRsrc = filter_args.pRsrc;
 		thread_args[t].pGsrc = filter_args.pGsrc;
 		thread_args[t].pBsrc = filter_args.pBsrc;
 		thread_args[t].pRdst = filter_args.pRdst;
 		thread_args[t].pGdst = filter_args.pGdst;
 		thread_args[t].pBdst = filter_args.pBdst;
-		thread_args[t].iteration = N_ITERATIONS;
+		thread_args[t].iteration = (t < remainingIterations) ?
+		iterationsPerThread + 1 : iterationsPerThread;
 		
 		// Calculate start and end pixels for this thread
 		thread_args[t].start = t * pixelsPerThread;
@@ -169,7 +172,7 @@ void execute_multithreaded_filter(filter_args_t filter_args, uint pixelsPerThrea
 	}
 	
 	// Wait for all threads to finish
-	for (int t = 0; t < NUM_THREADS; t++) {
+	for (uint t = 0; t < NUM_THREADS; t++) {
 		if (pthread_join(threads[t], NULL) != 0) {
 			fprintf(stderr, "Error joining thread %d\n", t);
 			exit(EXIT_FAILURE);
