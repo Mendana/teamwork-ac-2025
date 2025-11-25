@@ -14,26 +14,20 @@
 #define B_WEIGHT 0.11
 #define MAX_BRIGHTNESS 255.0
 
+
+
 #define NUM_THREADS 8
 
 //Number of iterations of the filter so it reaches the required time
-#define N_ITERATIONS 125
+#define N_ITERATIONS 250
 
 using namespace cimg_library;
 
 // Data type for image components
-// FIXME: Change this type according to your group assignment
 typedef double data_t;
 
 const char* SOURCE_IMG      = "bailarina.bmp";
 const char* DESTINATION_IMG = "bailarina2.bmp";
-
-// Structure used by each thread to know which part of the image to process.
-typedef struct {
-    data_t *pRsrc, *pGsrc, *pBsrc;
-    data_t *pRdst, *pGdst, *pBdst;
-    uint start, end;
-} thread_args_t;
 
 // Filter argument data type
 typedef struct {
@@ -44,6 +38,7 @@ typedef struct {
 	data_t *pGdst;
 	data_t *pBdst;
 	uint pixelCount; // Size of the image in pixels
+	uint start, end; // Thread-specific pixel range
 } filter_args_t;
 
 /***********************************************
@@ -61,56 +56,53 @@ typedef struct {
  * 		
  * *********************************************/
 void* thread_filter(void* args){
-	thread_args_t* tArgs = (thread_args_t*) args;
-	for (uint i = tArgs->start; i < tArgs->end; i++) {
-		data_t L = *(tArgs->pRsrc + i) * R_WEIGHT + 
-				   *(tArgs->pGsrc + i) * G_WEIGHT + 
-				   *(tArgs->pBsrc + i) * B_WEIGHT;
-
-		L = MAX_BRIGHTNESS - L;
-
-		*(tArgs->pRdst + i) = L;
-		*(tArgs->pGdst + i) = L;
-		*(tArgs->pBdst + i) = L;
-	}
-	pthread_exit(NULL);
+    filter_args_t* tArgs = (filter_args_t*) args;
+    
+    data_t *pR = tArgs->pRsrc + tArgs->start;
+    data_t *pG = tArgs->pGsrc + tArgs->start;
+    data_t *pB = tArgs->pBsrc + tArgs->start;
+    data_t *pRdst = tArgs->pRdst + tArgs->start;
+    data_t *pGdst = tArgs->pGdst + tArgs->start;
+    data_t *pBdst = tArgs->pBdst + tArgs->start;
+    
+    uint length = tArgs->end - tArgs->start;
+    
+    // Process this thread's portion of the image
+    for (uint i = 0; i < length; i++) {
+        data_t L = MAX_BRIGHTNESS - (pR[i] * R_WEIGHT + pG[i] * G_WEIGHT + pB[i] * B_WEIGHT);
+        pRdst[i] = L;
+        pGdst[i] = L;
+        pBdst[i] = L;
+    }
+    
+    pthread_exit(NULL);
 }
 
 /***********************************************
  * Multithreaded filter execution
  * Creates threads, distributes work, and waits for completion
  * *********************************************/
-void execute_multithreaded_filter(filter_args_t filter_args, uint pixelsPerThread) {
+void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThread) {
 	pthread_t threads[NUM_THREADS];
-	thread_args_t thread_args[NUM_THREADS];
+	filter_args_t thread_args[NUM_THREADS];
 	
 	// Prepare thread arguments and create threads
-	for (int t = 0; t < NUM_THREADS; t++) {
-		thread_args[t].pRsrc = filter_args.pRsrc;
-		thread_args[t].pGsrc = filter_args.pGsrc;
-		thread_args[t].pBsrc = filter_args.pBsrc;
-		thread_args[t].pRdst = filter_args.pRdst;
-		thread_args[t].pGdst = filter_args.pGdst;
-		thread_args[t].pBdst = filter_args.pBdst;
+	for (uint t = 0; t < NUM_THREADS; t++) {
+		thread_args[t] = *filter_args;
 		
 		// Calculate start and end pixels for this thread
 		thread_args[t].start = t * pixelsPerThread;
 		// Last thread processes remaining pixels
-		if (t == NUM_THREADS - 1) {
-			thread_args[t].end = filter_args.pixelCount;
-		} else {
-			thread_args[t].end = (t + 1) * pixelsPerThread;
-		}
+		thread_args[t].end = (t == NUM_THREADS - 1) ? filter_args->pixelCount : (t + 1) * pixelsPerThread;
 		
-		// Create thread
-		if (pthread_create(&threads[t], NULL, thread_filter, &thread_args[t]) != 0) {
-			fprintf(stderr, "Error creating thread %d\n", t);
+		if(pthread_create(&threads[t], NULL, thread_filter, &thread_args[t]) != 0){
+			fprintf(stderr, "Error creating thread");
 			exit(EXIT_FAILURE);
 		}
 	}
 	
 	// Wait for all threads to finish
-	for (int t = 0; t < NUM_THREADS; t++) {
+	for (uint t = 0; t < NUM_THREADS; t++) {
 		if (pthread_join(threads[t], NULL) != 0) {
 			fprintf(stderr, "Error joining thread %d\n", t);
 			exit(EXIT_FAILURE);
@@ -178,12 +170,12 @@ int main() {
 		exit(EXIT_FAILURE);
 	}
 
-
 	/************************************************
 	 * Algorithm - Multithreaded version
 	 */
-	for (int iter = 0; iter < N_ITERATIONS; iter++){
-		execute_multithreaded_filter(filter_args, pixelsPerThread);
+	
+	for (uint iter = 0; iter < N_ITERATIONS; iter++) {
+		execute_multithreaded_filter(&filter_args, pixelsPerThread);
 	}
 
 
