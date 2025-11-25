@@ -16,7 +16,7 @@
 #define MAX_BRIGHTNESS 255.0
 
 //Number of iterations of the filter so it reaches the required time
-#define N_ITERATIONS 250
+#define N_ITERATIONS 125
 
 using namespace cimg_library;
 
@@ -61,24 +61,22 @@ void filter (filter_args_t args) {
 	const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
 
 	const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
-	simd_t vr, vg, vb, L;
 
 	for(uint i = 0; i < nPackets; i++){
 		const uint pos = i * ITEMS_PER_PACKET;
 
-		vr = _mm_loadu_pd(args.pRsrc + pos);
-		vg = _mm_loadu_pd(args.pGsrc + pos);
-		vb = _mm_loadu_pd(args.pBsrc + pos);
+		const simd_t vr = _mm_load_pd(args.pRsrc + pos);
+		const simd_t vg = _mm_load_pd(args.pGsrc + pos);
+		const simd_t vb = _mm_load_pd(args.pBsrc + pos);
 
-		L = _mm_mul_pd(vr, r_weight);
-		L = _mm_fmadd_pd(vg, g_weight, L);
-		L = _mm_fmadd_pd(vb, b_weight, L);
+		simd_t L = _mm_mul_pd(vr, r_weight);
+		L = _mm_add_pd(L, _mm_mul_pd(g_weight, vg));
+		L = _mm_add_pd(L, _mm_mul_pd(b_weight, vb));
 		L = _mm_sub_pd(max_brightness, L);
 
-
-		*(simd_t*)(args.pRdst + pos) = L;
-		*(simd_t*)(args.pGdst + pos) = L;
-		*(simd_t*)(args.pBdst + pos) = L;
+		_mm_storeu_pd(args.pRdst + pos, L);
+ 		_mm_storeu_pd(args.pGdst + pos, L);
+ 		_mm_storeu_pd(args.pBdst + pos, L);
 	}
 
 	for (uint i = nPackets * ITEMS_PER_PACKET; i < args.pixelCount; i++){
@@ -127,23 +125,22 @@ int main() {
 	// Calculating image size in pixels
 	filter_args.pixelCount = width * height;
 	
-	// CAMBIO: Alineamiento a 16 bytes (128 bits) en lugar de 32
-	uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
-	pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
+	// Allocate memory space for destination image components
+	pDstImage = (data_t *) malloc (filter_args.pixelCount * nComp * sizeof(data_t));
 	if (pDstImage == NULL) {
 		perror("Allocating destination image");
 		exit(-2);
 	}
 
-	// Pointers to the componet arrays of the source image
-	filter_args.pRsrc = srcImage.data(); // pRcomp points to the R component array
-	filter_args.pGsrc = filter_args.pRsrc + filter_args.pixelCount; // pGcomp points to the G component array
-	filter_args.pBsrc = filter_args.pGsrc + filter_args.pixelCount; // pBcomp points to B component array
+	// Pointers to the component arrays of the source image
+	filter_args.pRsrc = srcImage.data();
+	filter_args.pGsrc = filter_args.pRsrc + filter_args.pixelCount;
+	filter_args.pBsrc = filter_args.pGsrc + filter_args.pixelCount;
 	
 	// Pointers to the RGB arrays of the destination image
 	filter_args.pRdst = pDstImage;
-	filter_args.pGdst = filter_args.pRdst + pixelCountAligned;
-	filter_args.pBdst = filter_args.pGdst + pixelCountAligned;
+	filter_args.pGdst = filter_args.pRdst + filter_args.pixelCount;
+	filter_args.pBdst = filter_args.pGdst + filter_args.pixelCount;
 
 
 	/***********************************************
@@ -184,6 +181,7 @@ int main() {
 		static_cast<unsigned int>(dstImage.height()) != height || 
 		static_cast<unsigned int>(dstImage.spectrum()) != nComp) {
 		fprintf(stderr, "Error: las dimensiones de la imagen de salida no coinciden con la original.\n");
+		_mm_free(srcImage);
 		_mm_free(pDstImage);
 		exit(EXIT_FAILURE);
 	}
@@ -195,7 +193,7 @@ int main() {
 	dstImage.display();
 	
 	// Free memory
-	_mm_free(pDstImage);
+	free(pDstImage);
 
 	return 0;
 }
