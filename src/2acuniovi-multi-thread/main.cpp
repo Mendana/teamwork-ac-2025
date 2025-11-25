@@ -19,7 +19,7 @@
 #define NUM_THREADS 8
 
 //Number of iterations of the filter so it reaches the required time
-#define N_ITERATIONS 125
+#define N_ITERATIONS 250
 
 using namespace cimg_library;
 
