@@ -472,21 +472,40 @@ Para la obtención de resultados, se midió el tiempo de ejecución de las disti
 \vspace{3ex}
 
 \subsection{Análisis de la versión multihilo}
-La implementación multihilo ha mostrado una mejora de rendimiento de aproximadamente 1.58 respecto a la versión monohilo. Aunque esta mejora es significativa, está muy lejos del teórico ideal de 8x (número de hilos y CPUs virtuales de la máquina). Esto resulta en una eficiencia del 19.75\%, lo cual indica que existen cuellos de botella en algunos puntos del proceso. Las posibles causas incluyen:
+La implementación multihilo ha mostrado una mejora de rendimiento 
+de aproximadamente 1.58 respecto a la versión monohilo. Aunque esta 
+mejora es significativa, está muy lejos del teórico ideal de x16 aunque 
+se hayan utilizado 8 hilos por motivos que se tratarán más adelante. Esto resulta en una eficiencia del 19.75\%, lo cual indica que existen cuellos de botella en algunos puntos del proceso. Las posibles causas incluyen:
 \begin{itemize}
-    \item \textbf{Overhead de creación/destrucción de hilos}: En cada iteración se crean y destruyen 8 hilos, lo que introduce un coste significativo en el tiempo total. Se ha mantenido este enfoque por indicaciones presentes en la rúbrica de evaluación.
+    \item \textbf{Contención de recursos}: Aunque cada hilo trabaja sobre un segmento independiente de la imagen, 
+    a partir de cierto número de hilos aparece contención 
+    en la memoria caché. Cuando demasiados hilos acceden simultáneamente 
+    a regiones de memoria cercanas aumenta el número de fallos de caché. Como 
+    el rendimiento pasa a estar limitado por el subsistema de memoria, hemos decidido 
+    limitar el número de hilos a 8.
+    \item \textbf{Overhead de creación/destrucción de hilos}: En cada iteración se crean y destruyen 8 hilos, lo que introduce un coste adicional en el tiempo total. Se ha mantenido este enfoque por indicaciones presentes en la rúbrica de evaluación.
     \item \textbf{Tamaño de trabajo insuficiente por hilo}: Dado que la imagen no es extremadamente grande, la cantidad de trabajo asignada a cada hilo puede ser insuficiente para amortiguar el overhead de gestión de hilos ya que las operaciones de sincronización pueden suponer un tiempo considerable en comparación con las operaciones de suma/multiplicación realizadas.
-    \item \textbf{Contención de recursos}: Aunque cada hilo trabaja sobre un segmento independiente de la imagen, puede haber contención en el acceso a la memoria caché o en la utilización de los núcleos del procesador, lo que limita la escalabilidad.
 \end{itemize}
 \vspace{3ex}
 
 \subsection{Análisis de la versión SIMD}
-Los resultados de la versión SIMD son especialmente sorprendentes: en lugar de mejorar el rendimiento, esta implementación resulta \textbf{0.74x más lenta} que la versión monohilo original. Se ha comprobado en varios ordenadores con diferentes procesadores y, en todos, los resultados son similares. Se ha verificado que todos ellos tuvieran soporte para las isntrucciones necesarias y que el código estuviera correctamente alineado y optimizado. Algunas posibles causas de este comportamiento incluyen:
+Los resultados de la versión SIMD son especialmente sorprendentes: en lugar de mejorar el rendimiento,
+ esta implementación resulta \textbf{0.74x más lenta} que la versión 
+ monohilo original. Se ha comprobado en varios ordenadores con diferentes
+  procesadores y, en todos, los resultados son similares. 
+  Se ha verificado que todos ellos tuvieran soporte para las 
+  instrucciones necesarias y que el código estuviera optimizado. Algunas posibles causas de este comportamiento incluyen:
 \begin{itemize}
     \item \textbf{Overhead en la gestión de memoria}: La utilización de memoria alineada y las operaciones de carga/almacenamiento SIMD pueden introducir un overhead que no compensa la paralelización a nivel de datos, especialmente si el tamaño de los datos no es lo suficientemente grande.
-    \item \textbf{Posibles dependencias de datos}: Aunque el algoritmo parece ser adecuado para SIMD, puede haber dependencias ocultas o patrones de acceso a memoria que no se benefician de la paralelización SIMD.
     \item \textbf{Limitaciones del compilador}: Es posible que el compilador no esté optimizando adecuadamente el código SIMD, o que las instrucciones generadas no sean las más eficientes para el hardware específico.
 \end{itemize}
+
+Además, hemos probado a realizar el alogritmo utilizando la operación 
+\texttt{\_mm\_fmadd\_pd()} en lugar de \texttt{\_mm\_add\_pd()}, pero la imagen generada 
+era distinta respecto a la monohilo y multihilo. Esto creemos que se debe a 
+que la instrucción \texttt{\_mm\_fmadd\_pd()} realiza la suma y la multiplicación en 
+una operación combinada, es por ello que solo redondea una vez. A diferencia de hacer una instrucción
+de suma y otra de multiplicación, que redondea dos veces, lo que provoca pequeñas diferencias en el resultado final.
 
 \newpage
 \part*{ANEXOS}
