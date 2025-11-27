@@ -1,7 +1,10 @@
 /*
- * Main.cpp
+ * 2acuniovi-simd/main.cpp
  *
- *  Created on: Fall 2019
+ * Image processing using SIMD instructions (SSE2).
+ * B&W inversion filter.
+ * 
+ * @date 2025-27-10
  */
 
 #include <stdio.h>
@@ -46,40 +49,48 @@ typedef struct {
  * 
  * Formula:
  * 
- * Para cada i = 0,...,pixelCount:
- * 1) Convertir a B&W
+ * For each pixel i = 0,...,pixelCount:
+ * 1) Convert to B&W
  * 	L(i) = 0.3 R(i) + 0.59 G(i) + 0.11 B(i)
- * 
- * 2) Invertir
+ * 2) Invert
  * 	L(i) = 255 - L(i)
- * 		
+ * 
+ * @param args Structure containing the arguments for the filter
+ * @return void		
  * *********************************************/
 void filter (filter_args_t args) {
+	// Precompute weights in SIMD registers
 	const simd_t r_weight = _mm_set1_pd(R_WEIGHT);
 	const simd_t g_weight = _mm_set1_pd(G_WEIGHT);
 	const simd_t b_weight = _mm_set1_pd(B_WEIGHT);
 	const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
 
+	// Process packets of ITEMS_PER_PACKET pixels
 	const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
 
+	// Main loop processing ITEMS_PER_PACKET pixels at a time
 	for(uint i = 0; i < nPackets; i++){
+		// Calculate the position of the first pixel in the packet
 		const uint pos = i * ITEMS_PER_PACKET;
 
+		// Load R, G, B values
 		const simd_t vr = _mm_load_pd(args.pRsrc + pos);
 		const simd_t vg = _mm_load_pd(args.pGsrc + pos);
 		const simd_t vb = _mm_load_pd(args.pBsrc + pos);
 
+		// Compute luminance L
 		simd_t L = _mm_mul_pd(vr, r_weight);
 		L = _mm_add_pd(L, _mm_mul_pd(g_weight,vg));
 		L = _mm_add_pd(L,_mm_mul_pd(b_weight,vb));
 		L = _mm_sub_pd(max_brightness, L);
 
-
+		// Store results
 		*(simd_t*)(args.pRdst + pos) = L;
 		*(simd_t*)(args.pGdst + pos) = L;
 		*(simd_t*)(args.pBdst + pos) = L;
 	}
 
+	// Process remaining pixels
 	for (uint i = nPackets * ITEMS_PER_PACKET; i < args.pixelCount; i++){
 		data_t L = *(args.pRsrc + i) * R_WEIGHT + 
 				*(args.pGsrc + i) * G_WEIGHT + 
@@ -93,9 +104,12 @@ void filter (filter_args_t args) {
 	}
 }
 
+/***********************************************
+ * Main program
+ **********************************************/
 int main() {
 	CImg<data_t> srcImage;
-	// Cargar imagen fuente - Controlando si existe
+	// Load source image - if the image does not exist, exit with error
 	try {
     	srcImage = CImg<data_t>(SOURCE_IMG);
 	} catch (CImgException& e) {
@@ -126,7 +140,7 @@ int main() {
 	// Calculating image size in pixels
 	filter_args.pixelCount = width * height;
 	
-	// CAMBIO: Alineamiento a 16 bytes (128 bits) en lugar de 32
+	// Allocate memory for the destination image - aligned to 16 bytes
 	uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
 	pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
 	if (pDstImage == NULL) {

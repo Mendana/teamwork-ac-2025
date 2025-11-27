@@ -1,7 +1,10 @@
 /*
- * Main.cpp
+ * 2acuniovi-multi-thread/main.cpp
  *
- *  Created on: Fall 2019
+ * Image processing using multithreading.
+ * Implements a black and white inversion filter using multiple threads.
+ * 
+ * @date 2025-27-10
  */
 
 #include <stdio.h>
@@ -47,13 +50,15 @@ typedef struct {
  * 
  * Formula:
  * 
- * Para cada i = 0,...,pixelCount:
- * 1) Convertir a B&W
+ * For each pixel i = 0,...,pixelCount:
+ * 1) Convert to B&W
  * 	L(i) = 0.3 R(i) + 0.59 G(i) + 0.11 B(i)
- * 
- * 2) Invertir
+ * 2) Invert
  * 	L(i) = 255 - L(i)
- * 		
+ * 
+ * 
+ * @param args Pointer to filter_args_t structure
+ * @return NULL
  * *********************************************/
 void* thread_filter(void* args){
     filter_args_t* tArgs = (filter_args_t*) args;
@@ -81,6 +86,10 @@ void* thread_filter(void* args){
 /***********************************************
  * Multithreaded filter execution
  * Creates threads, distributes work, and waits for completion
+ * 
+ * @param filter_args Pointer to filter_args_t structure
+ * @param pixelsPerThread Number of pixels each thread should process
+ * @return void
  * *********************************************/
 void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThread) {
 	pthread_t threads[NUM_THREADS];
@@ -110,6 +119,9 @@ void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThre
 	}
 }
 
+/***********************************************
+ * Main function
+ ***********************************************/
 int main() {
 	CImg<data_t> srcImage;
 	// Cargar imagen fuente - Controlando si existe
