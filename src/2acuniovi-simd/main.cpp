@@ -74,9 +74,9 @@ void filter (filter_args_t args) {
 		const uint pos = i * ITEMS_PER_PACKET;
 
 		// Load R, G, B values
-		const simd_t vr = _mm_load_pd(args.pRsrc + pos);
-		const simd_t vg = _mm_load_pd(args.pGsrc + pos);
-		const simd_t vb = _mm_load_pd(args.pBsrc + pos);
+		const simd_t vr = _mm_loadu_pd(args.pRsrc + pos);
+		const simd_t vg = _mm_loadu_pd(args.pGsrc + pos);
+		const simd_t vb = _mm_loadu_pd(args.pBsrc + pos);
 
 		// Compute luminance L
 		simd_t L = _mm_mul_pd(vr, r_weight);
@@ -174,7 +174,20 @@ int main() {
 	for (int i = 0; i < N_ITERATIONS; i++){
 		filter(filter_args);
 	}
+	
+	data_t *pDstImageCompact;
 
+	// If the original pixel count is different than the aligned one
+	if(pixelCountAligned != filter_args.pixelCount){
+		pDstImageCompact = (data_t *) malloc(filter_args.pixelCount * nComp * sizeof(data_t));
+
+		// Copy each component without the padding:
+		memcpy(pDstImageCompact, filter_args.pRdst, filter_args.pixelCount * sizeof(data_t));
+		memcpy(pDstImageCompact + filter_args.pixelCount, filter_args.pGdst, filter_args.pixelCount * sizeof(data_t));
+		memcpy(pDstImageCompact + 2 * filter_args.pixelCount, filter_args.pBdst, filter_args.pixelCount * sizeof(data_t));
+	}
+
+	
 
 	/***********************************************
 	 *   - Measure the end time
@@ -191,6 +204,11 @@ int main() {
 	// Create a new image object with the calculated pixels
 	// In case of normal color images use nComp=3,
 	// In case of B/W images use nComp=1.
+	if(pixelCountAligned != filter_args.pixelCount){
+		// Switch to compact version (without padding)
+		_mm_free(pDstImage); // Free the aligned memory first
+		pDstImage = pDstImageCompact;
+	}
 	CImg<data_t> dstImage(pDstImage, width, height, 1, nComp);
 
 	if (static_cast<unsigned int>(dstImage.width()) != width || 
@@ -208,7 +226,11 @@ int main() {
 	dstImage.display();
 	
 	// Free memory
-	_mm_free(pDstImage);
+	if(pixelCountAligned != filter_args.pixelCount){
+		free(pDstImage); // Was allocated with malloc (compact version)
+	} else {
+		_mm_free(pDstImage); // Was allocated with _mm_malloc (aligned version)
+	}
 
 	return 0;
 }

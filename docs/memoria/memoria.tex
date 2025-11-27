@@ -269,7 +269,7 @@ En la primera fase del proyecto se desarrolló la versión monohilo del algoritm
 En la segunda fase del proyecto, se optimizó el algoritmo mediante el uso de instrucciones SIMD y la paralelización con múltiples hilos. No obstante, los resultados no han mostrado una mejora significativa en el rendimiento, que posteriormente se analizará en detalle.\vspace{2ex}
 
 \subsubsection{Optimización SIMD}
-Para la optimización SIMD, se ha empleado la librería \texttt{immintrin.h} que proporciona acceso a las instrucciones \texttt{SSE} y \texttt{AVX}. Se han empleado paquetes de 128 bits (\texttt{\_\_m128d}) para procesar dos valores \texttt{double} simultáneamente. El objetivo es aprovechar el paralelismo de datos a nivel de instrucción para reducir el número de iteraciones necesarias procesando múltiples píxeles en cada ciclo.\vspace{2ex}
+Para la optimización SIMD, se ha empleado la librería \texttt{immintrin.h} que proporciona acceso a las instrucciones \texttt{SSE} y \texttt{AVX}. Se han empleado paquetes de 128 bits (\texttt{\_\_m128d}) para procesar dos valores \texttt{double} simultáneamente. El objetivo es aprovechar el paralelismo de datos a nivel de instrucción para reducir el número de iteraciones necesarias procesando múltiples píxeles en cada ciclo.\vspace{1ex}
 
 \noindent Para la inicialización de los vectores, las constantes de algoritmo se cargaron replicando el valor en ambos elementos del vector:
 \begin{lstlisting}[style=cppStyle]
@@ -288,8 +288,8 @@ pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 1
 \end{lstlisting}
 
 \noindent El bucle principal del filtro procesa la imagen en paquetes de dos píxeles. Para cada paquete, 
-se cargan los valores RGB mediante \texttt{\_mm\_load\_pd()} (esto 
-es debido a que los datos ya están alineados), se calcula la luminosidad 
+se cargan los valores RGB mediante \texttt{\_mm\_loadu\_pd()} para mantener la coherencia, aunque en este 
+caso los datos estén alineados (se podría usar \texttt{\_mm\_load\_pd()}). Finalmente, se calcula la luminosidad 
 ponderada con \texttt{\_mm\_mul\_pd()} y \texttt{\_mm\_add\_pd()} y 
 finalmente se invierte con \texttt{\_mm\_sub\_pd()}. 
 \vspace{1ex}
@@ -299,12 +299,11 @@ finalmente se invierte con \texttt{\_mm\_sub\_pd()}.
 separadamente redondea dos veces, lo que puede introducir pequeñas diferencias respecto a la imagen monohilo. 
 \begin{lstlisting}[style=cppStyle]
 const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
-
 for(uint i = 0; i < nPackets; i++){
 	const uint pos = i * ITEMS_PER_PACKET;
-	const simd_t vr = _mm_load_pd(args.pRsrc + pos);
-	const simd_t vg = _mm_load_pd(args.pGsrc + pos);
-	const simd_t vb = _mm_load_pd(args.pBsrc + pos);
+	const simd_t vr = _mm_loadu_pd(args.pRsrc + pos);
+	const simd_t vg = _mm_loadu_pd(args.pGsrc + pos);
+	const simd_t vb = _mm_loadu_pd(args.pBsrc + pos);
 
 	simd_t L = _mm_mul_pd(vr, r_weight);
 	L = _mm_add_pd(L, _mm_mul_pd(g_weight,vg));
@@ -369,9 +368,11 @@ void* thread_filter(void* args){
     pthread_exit(NULL);
 }
 \end{lstlisting}
-\vspace{2ex}
+\vspace{1ex}
 
 \noindent La función \texttt{execute\_multithreaded\_filter()} se encarga de coordinar la ejecución paralela. Para ello, calcula los píxeles por hilo, crea los hilos con \texttt{pthread\_create()} y espera a que terminen con \texttt{pthread\_join()}. El último hilo se encarga de procesar cualquier píxel restante en caso de que el total no sea divisible por el número de hilos:
+\vspace{2ex}
+
 \begin{lstlisting}[style=cppStyle]
 void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThread) {
 	pthread_t threads[NUM_THREADS];
@@ -379,7 +380,6 @@ void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThre
 	
 	for (uint t = 0; t < NUM_THREADS; t++) {
 		thread_args[t] = *filter_args;
-		
 		thread_args[t].start = t * pixelsPerThread;
 		thread_args[t].end = (t == NUM_THREADS - 1) ? filter_args->pixelCount : (t + 1) * pixelsPerThread;
 		
@@ -397,10 +397,10 @@ void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThre
 	}
 }
 \end{lstlisting}
-\vspace{2ex}
+\vspace{1ex}
 
 \noindent Finalmente, en la función principal, se calcula el número de píxeles por hilo y se llama a \texttt{execute\_multithreaded\_filter()} para iniciar el procesamiento paralelo. Esta función se ejecutará el número de veces fijado para medir el tiempo total de ejecución. A continuación, se muestran las imágenes resultantes:
-\vspace{2ex}
+\vspace{1ex}
 \begin{center}
 \begin{minipage}{0.49\textwidth}
     \centering
@@ -523,7 +523,8 @@ A continuación, se muestra el resultado de aplicar la herramienta \texttt{diffI
 \vspace{2ex}
 
 
-\newpage\subsection{Metodología de trabajo}
+\newpage
+\section{Metodología de trabajo}
 El desarrollo del proyecto se llevó a cabo mediante una metodología colaborativa de carácter modular, fundamentada en la división funcional del sistema y en el uso riguroso de \textit{Git} y \textit{GitHub} como herramientas centrales de control de versiones. Cada integrante del equipo asumió la responsabilidad completa de un componente del proyecto —incluyendo su implementación, verificación y documentación— lo que permitió una organización eficiente del trabajo y una especialización técnica adecuada en cada módulo. \vspace{2ex}
 
 \noindent El flujo de trabajo adoptado se estructuró conforme al modelo de \textit{feature branching}. Cada funcionalidad fue desarrollada en una rama independiente derivada de la rama principal \texttt{main}, y su incorporación al proyecto se realizó mediante \textit{pull requests}. Este procedimiento garantizó un proceso de \textit{code review} sistemático, facilitando la detección de inconsistencias, la resolución de conflictos y el aseguramiento de la coherencia entre módulos. Asimismo, este enfoque proporcionó trazabilidad completa sobre los cambios efectuados y fomentó una colaboración asíncrona ordenada y transparente. \vspace{2ex}
