@@ -32,58 +32,93 @@
 
 \graphicspath{ {images/}}
 
-% Colores personalizados
-\definecolor{CppBackground}{RGB}{248, 248, 248}
-\definecolor{CppBorder}{RGB}{220, 220, 220}
-\definecolor{CppTags}{RGB}{0, 119, 170}
-\definecolor{CppAttributes}{RGB}{165, 42, 42}
-\definecolor{CppValues}{RGB}{0, 128, 0}
-\definecolor{CppStrings}{RGB}{34, 139, 34}
-\definecolor{CppComments}{RGB}{128, 128, 128}
-\definecolor{CppLineNumbers}{RGB}{160, 160, 160}
+% Colores personalizados para código C++
+\definecolor{CppBackground}{RGB}{245, 247, 250}
+\definecolor{CppBorder}{RGB}{79, 134, 247}
+\definecolor{CppKeyword}{RGB}{215, 58, 73}
+\definecolor{CppType}{RGB}{0, 92, 197}
+\definecolor{CppString}{RGB}{3, 106, 7}
+\definecolor{CppComment}{RGB}{106, 115, 125}
+\definecolor{CppLineNumbers}{RGB}{87, 96, 106}
+\definecolor{CppFunction}{RGB}{111, 66, 193}
+\definecolor{CppNumber}{RGB}{0, 92, 197}
 
 % Definición del lenguaje C++
 \lstdefinelanguage{CPP}{
   sensitive=true,
   morecomment=[s]{/*}{*/},
+  morecomment=[l]{//},
   morestring=[b]",
   morestring=[b]',
-  morekeywords=[1]{auto,break,case,char,const,continue,default,do,double,else,
-    enum,extern,float,for,goto,if,int,long,register,return,
-    short,signed,sizeof,static,struct,switch,typedef,union,
-    unsigned,void,volatile,while,class,private,protected,
-    public,this,using,namespace,new,delete,true,false,nullptr,
-    template,typename,typeid,constexpr,const_cast,dynamic_cast,
-    explicit,friend,inline,mutable,nolint,reinterpret_cast,
-    static_cast,virtual},
-    morekeywords=[2]{int,float,double,char,void,bool,true,false,nullptr,size_t,
-    uint8_t,uint16_t,uint32_t,uint64_t}
+  % Palabras clave de control de flujo y estructura
+  morekeywords=[1]{auto,break,case,catch,const,constexpr,continue,
+    default,do,else,for,goto,if,return,switch,throw,try,while,
+    class,enum,namespace,struct,typedef,union,using,
+    explicit,export,extern,friend,inline,mutable,operator,
+    private,protected,public,static,template,this,typename,virtual,
+    volatile,asm,dynamic_cast,const_cast,reinterpret_cast,static_cast,
+    typeid,alignas,alignof,decltype,noexcept,static_assert,thread_local},
+  % Tipos de datos y modificadores
+  morekeywords=[2]{bool,char,double,float,int,long,short,signed,
+    unsigned,void,wchar_t,char16_t,char32_t,size_t,
+    int8_t,int16_t,int32_t,int64_t,
+    uint8_t,uint16_t,uint32_t,uint64_t,
+    nullptr_t,ptrdiff_t,data_t,uint},
+  % Palabras clave especiales y literales
+  morekeywords=[3]{true,false,nullptr,new,delete,sizeof},
+  % Clases y tipos específicos del proyecto
+  morekeywords=[4]{CImg,CImgException,filter_args_t,timespec,
+    EXIT_FAILURE,EXIT_SUCCESS,F_OK,CLOCK_REALTIME,SOURCE_IMG,
+    stderr,stdout,stdin,NULL,
+    N_ITERATIONS,NUM_THREADS,ITEMS_PER_PACKET,
+    R_WEIGHT,G_WEIGHT,B_WEIGHT,MAX_BRIGHTNESS,
+    simd_t,pthread_t,nComp,pixelCountAligned,nPackets,
+    tv_sec,tv_nsec,tStart,tEnd,elapsedTime,
+    pRsrc,pGsrc,pBsrc,pRdst,pGdst,pBdst,pixelCount,
+    start,end,srcImage,pDstImage,filter_args,
+    vr,vg,vb,threads,thread_args,tArgs,pixelsPerThread,
+    pR,pG,pB,length,pos}
 }
 
-% Estilo de código
+% Estilo de código mejorado
 \lstdefinestyle{cppStyle}{
   language=CPP,
   backgroundcolor=\color{CppBackground},
-  basicstyle=\ttfamily\footnotesize,
-  keywordstyle=[1]{\color{CppTags}\bfseries},
-  keywordstyle=[2]{\color{CppAttributes}},
-  stringstyle=\color{CppStrings},
-  commentstyle=\color{CppComments}\itshape,
+  basicstyle=\ttfamily\small,
+  keywordstyle=[1]{\color{CppKeyword}\bfseries},
+  keywordstyle=[2]{\color{CppType}\bfseries},
+  keywordstyle=[3]{\color{CppKeyword}\bfseries},
+  keywordstyle=[4]{\color{CppType}},
+  stringstyle=\color{CppString},
+  commentstyle=\color{CppComment}\itshape,
+  numberstyle=\tiny\color{CppLineNumbers}\ttfamily,
   breaklines=true,
-  columns=fullflexible,
+  breakatwhitespace=true,
+  columns=flexible,
+  keepspaces=true,
   showspaces=false,
   showstringspaces=false,
   showtabs=false,
-  tabsize=2,
-  frame=topline,
+  tabsize=4,
+  frame=leftline,
   framesep=8pt,
-  framerule=1.5pt,
+  framerule=3pt,
   rulecolor=\color{CppBorder},
-  xleftmargin=10pt,
+  xleftmargin=18pt,
+  xrightmargin=5pt,
+  framexleftmargin=6pt,
   numbers=left,
-  numberstyle=\tiny\color{CppLineNumbers}\sffamily,
-  numbersep=15pt,
-  title={\footnotesize\colorbox{CppBackground!50}{\textcolor{CppTags}{}}},
+  numbersep=8pt,
+  stepnumber=1,
+  captionpos=b,
+  aboveskip=12pt,
+  belowskip=8pt,
+  emphstyle=\color{CppFunction}\bfseries,
+  emph={filter,load_image,clock_gettime,access,printf,fprintf,exit,
+    _mm_set1_pd,_mm_loadu_pd,_mm_mul_pd,_mm_fmadd_pd,_mm_sub_pd,
+    _mm_malloc,_mm_free,
+    pthread_create,pthread_join,pthread_exit,
+    thread_filter,execute_multithreaded_filter},
   literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
            {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
            {ñ}{{\~n}}1 {Ñ}{{\~N}}1,
@@ -107,7 +142,7 @@
         
         {\Large Curso 2025-2026} \\[1.5cm]
         
-        \textbf{\LARGE Teamwork} \\[0.8cm]
+        \textbf{\LARGE Trabajo en grupo} \\[0.8cm]
         
         \text{Díaz Mendaña, Diego - UO301887}\\[0.15cm]
         \text{García Pernas, Pablo - UO300167}\\[0.15cm]
@@ -133,14 +168,8 @@
 \newpage
 
 \section{Introducción}
-La presente memoria recoge el desarrollo del proyecto correspondiente a la asignatura \textit{Arquitectura de Computadores}, impartida durante el curso académico 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El objetivo del proyecto es aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Asimismo, se realiza un análisis del rendimiento del filtro y una comparación entre las versiones monohilo y multihilo.\vspace{2ex}
-
-\noindent El trabajo se ha estructurado en distintas fases progresivas:
-\begin{itemize}
-    \item \textbf{Entrega 1 (Monohilo):} Implementación básica del filtro de imágenes en un único hilo de ejecución.
-    \item \textbf{Entrega 2 (SIMD y Multihilo):} Optimización del filtro mediante el uso de instrucciones SIMD y la paralelización con múltiples hilos.
-\end{itemize}
-\vspace{3ex}
+La presente memoria recoge el desarrollo del proyecto correspondiente a la asignatura \textit{Arquitectura de Computadores}, impartida durante el curso académico 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El objetivo del proyecto es aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Asimismo, se realiza un análisis del rendimiento del filtro y una comparación entre las versiones monohilo y multihilo.
+\vspace{2ex}
 
 \section{Máquina virtual}
 Para el desarrollo del proyecto se utilizó la máquina virtual proporcionada por los profesores, a continuación se muestra una captura de pantalla 
@@ -150,51 +179,41 @@ con la configuración del sistema:
 \end{center}
 \vspace{2ex}
 
-
-
-\section{Desarrollo del algoritmo}
-Se desarrolló el algoritmo de inversión en blanco y negro (Algoritmo número \#3). El desarrollo se realizó utilizando la máquina virtual proporcionada por el profesorado, junto con la plantilla base facilitada.
+Además, como se ha indicado en el enunciado del trabajo se adjunta archivo 
+\texttt{cpuinfo} con las características de la CPU usada para el análisis del rendimiento.
 \vspace{2ex}
 
-\subsection{Comprobaciones e inicialización}
-Antes de implementar el algoritmo, se llevaron a cabo las comprobaciones necesarias para verificar la existencia del archivo de imagen y la correcta inicialización de las variables. La comprobación de existencia se realiza mediante la siguiente función:
 
-\begin{lstlisting}[style=cppStyle]
-CImg<data_t> load_image(const char* filename) {
-    if (access(filename, F_OK) == -1) {
-        fprintf(stderr, "Error: la imagen '%s' no existe.\n", filename);
-        exit(EXIT_FAILURE);
-    }
-
-    CImg<data_t> image(filename); 
-    return image;
-}
-\end{lstlisting}
-
-Esta función recibe como parámetro el nombre del archivo y emplea la llamada \texttt{access()} con el parámetro \texttt{F\_OK}. Si la imagen no existe, la función devuelve \(-1\), se muestra un mensaje de error en la salida estándar y finaliza la ejecución del programa.\vspace{2ex}
-
-En caso de existir el archivo, se crea un objeto de la clase \texttt{CImg} y se devuelve. Adicionalmente, se comprueba que las dimensiones y el espectro de la imagen de salida coincidan con los de la imagen original.
-Asimismo, se modificó el tipo de dato empleado de \texttt{float} a \texttt{double}. Se definieron también los pesos para las componentes de color y el brillo máximo, como se muestra a continuación:
-
-\begin{lstlisting}[style=cppStyle]
-#define R_WEIGHT 0.3
-#define G_WEIGHT 0.59
-#define B_WEIGHT 0.11
-#define MAX_BRIGHTNESS 255.0
-\end{lstlisting}
+\section{Desarrollo del algoritmo}\label{sec:desarrollo-algoritmo}
+Se ha desarrollado el algoritmo de inversión en blanco y negro (\textit{Algoritmo número \#3}) empleando la plantilla 
+facilitada por el profesorado.
 \vspace{2ex}
 
-Para medir el tiempo de ejecución, se emplearon las funciones \texttt{clock\_gettime()} con los parámetros \texttt{CLOCK\_REALTIME} y las direcciones de memoria de las variables. En caso de error, se muestra un mensaje y se finaliza la ejecución. 
-Se calcula el tiempo transcurrido y se muestra por la salida estándar:
-\begin{lstlisting}[style=cppStyle]
-elapsedTime = (tEnd.tv_sec - tStart.tv_sec) + 
-              (tEnd.tv_nsec - tStart.tv_nsec) / 1e+9;
-printf("Elapsed time (%d repetitions): %.6f seconds\n", 
-        N_ITERATIONS, elapsedTime);
-\end{lstlisting}
+\noindent El algoritmo consiste en calcular el valor de luminancia de cada pixel, para ello 
+se sigue la formúla de luminancia del espacio de color \textit{UIT-R BT.601-7} con los pesos aproximados:
+
+   \begin{align*}
+    L_i = 0.3\cdot R_i + 0.59\cdot G_i + 0.11\cdot B_i \quad \text{ con } \begin{cases} 
+        L_i \text{ valor luminancia pixel } i \\
+        R_i \text{ componente roja pixel } i \\
+        G_i \text{ componente verde pixel } i \\
+        B_i \text{ componente azul pixel } i
+    \end{cases}
+   \end{align*}
+
+\noindent Una vez obtenido este valor se invierte respecto al brillo máximo para 
+obtener el efecto de inversión en blanco y negro.
+\begin{align*}
+    L_i^\prime = 255 - L_i
+\end{align*}
+Notar que el valor obtenido no va a ser nunca negativo o superior a \(255\), es por ello 
+que no hace falta realizar estas comprobaciones.
 
 \subsection{Implementación del algoritmo}
-El algoritmo implementado corresponde al filtro de inversión en escala de grises. Para cada píxel de la imagen, la función \texttt{filter} calcula una luminosidad ponderada a partir de las componentes RGB, utilizando los coeficientes definidos previamente. El valor resultante se invierte respecto al brillo máximo y se asigna a las tres componentes del píxel en la imagen de salida:
+Como la lógica del algoritmo es la misma para las 3 versiones, a continuación solo 
+se muestra la implementación de la versión monohilo para mayor claridad, el resto se 
+encuentra en el código fuente y se ha implementado usando el tipo \texttt{double}. Para cada pixel de la imagen se realiza el algoritmo detallado anteriormente y se 
+guarda el resultado en los 3 canales de color del píxel de la imagen resultante.
 
 \begin{lstlisting}[style=cppStyle]
 void filter (filter_args_t args) {
@@ -211,30 +230,17 @@ void filter (filter_args_t args) {
     }
 }
 \end{lstlisting}
+\vspace{2ex}
 
-Dado que el tiempo de ejecución debía situarse entre 8 y 15 segundos, se realizó un bucle de 125 iteraciones de la función \texttt{filter} para mantener el tiempo dentro del rango esperado:
+\noindent Dado que el tiempo de ejecución debía situarse entre 8 y 15 segundos en la versión monohilo, se realizó un bucle de 250 iteraciones de la función \texttt{filter} para mantener el tiempo dentro del rango esperado:
 \begin{lstlisting}[style=cppStyle]
 for (int i = 0; i < N_ITERATIONS; i++) {
     filter(filter_args);
 }
 \end{lstlisting}
+Para mantener la coherencia en las mediciones, se ha decidido mantener este enfoque en todas las implementaciones del algoritmo.
+\vspace{2ex}
 
-A continuación, se muestran la imagen original y la imagen resultante tras aplicar el filtro:
-
-\begin{figure}[h!]
-\centering
-\begin{minipage}[c]{0.45\textwidth}
-    \centering
-    \includegraphics[width=\linewidth,height=6cm,keepaspectratio]{ImagenOriginal.png}
-    \caption{Imagen original.}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.45\textwidth}
-    \centering
-    \includegraphics[width=\linewidth,height=6cm,keepaspectratio]{ImagenResultanteMonohilo.png}
-    \caption{Imagen resultante (versión monohilo).}
-\end{minipage}
-\end{figure}
 
 
 
@@ -242,13 +248,311 @@ A continuación, se muestran la imagen original y la imagen resultante tras apli
 
 \section{Desarrollo del Proyecto}
 \subsection{Fase 1: Implementación Monohilo}
-En la primera fase del proyecto se desarrolló la versión monohilo del algoritmo, centrada en la comprensión del flujo de procesamiento y en la verificación de la corrección del filtro aplicado sobre las imágenes.
+En la primera fase del proyecto se desarrolló la versión monohilo del algoritmo, centrada en la comprensión del flujo de procesamiento y en la verificación de la corrección del filtro aplicado sobre las imágenes. El proceso es el descrito en la \hyperref[sec:desarrollo-algoritmo]{sección anterior}. A continuación, se muestran la imagen original y la imagen resultante tras aplicar el filtro:
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}[c]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,height=6cm,keepaspectratio]{ImagenOriginal.png}
+    \caption{Imagen original}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,height=6cm,keepaspectratio]{ImagenResultanteMonohilo.png}
+    \caption{Imagen resultante (monohilo)}
+\end{minipage}
+\end{figure}
+
+\subsection{Fase 2: Optimización SIMD y Multihilo}
+En la segunda fase del proyecto, se optimizó el algoritmo mediante el uso de instrucciones SIMD y la paralelización con múltiples hilos. No obstante, los resultados no han mostrado una mejora significativa en el rendimiento, que posteriormente se analizará en detalle.\vspace{2ex}
+
+\subsubsection{Optimización SIMD}
+Para la optimización SIMD, se ha empleado la librería \texttt{immintrin.h} que proporciona acceso a las instrucciones \texttt{SSE} y \texttt{AVX}. Se han empleado paquetes de 128 bits (\texttt{\_\_m128d}) para procesar dos valores \texttt{double} simultáneamente. El objetivo es aprovechar el paralelismo de datos a nivel de instrucción para reducir el número de iteraciones necesarias procesando múltiples píxeles en cada ciclo.\vspace{2ex}
+
+\noindent Para la inicialización de los vectores, las constantes de algoritmo se cargaron replicando el valor en ambos elementos del vector:
+\begin{lstlisting}[style=cppStyle]
+typedef __m128d simd_t;
+
+const simd_t r_weight = _mm_set1_pd(R_WEIGHT);
+const simd_t g_weight = _mm_set1_pd(G_WEIGHT);
+const simd_t b_weight = _mm_set1_pd(B_WEIGHT);
+const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
+\end{lstlisting}
+
+\noindent Para tener un acceso eficiente a los datos, se utiliza \texttt{\_mm\_malloc()} con alineamiento a 16 bytes (tamaño de \texttt{\_\_m128d}). También se asegura el tamaño del buffer de destino para que tenga capacidad suficiente:
+\begin{lstlisting}[style=cppStyle]
+uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
+pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
+\end{lstlisting}
+
+\noindent El bucle principal del filtro procesa la imagen en paquetes de dos píxeles. Para cada paquete, 
+se cargan los valores RGB mediante \texttt{\_mm\_load\_pd()} (esto 
+es debido a que los datos ya están alineados), se calcula la luminosidad 
+ponderada con \texttt{\_mm\_mul\_pd()} y \texttt{\_mm\_add\_pd()} y 
+finalmente se invierte con \texttt{\_mm\_sub\_pd()}. 
+\vspace{1ex}
+
+\noindent Hemos decidido no utilizar la instrucción
+ \texttt{\_mm\_fmadd\_pd()} ya que esta redondea una única vez, mientras que multiplicar y sumar 
+separadamente redondea dos veces, lo que puede introducir pequeñas diferencias respecto a la imagen monohilo. 
+\begin{lstlisting}[style=cppStyle]
+const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
+
+for(uint i = 0; i < nPackets; i++){
+	const uint pos = i * ITEMS_PER_PACKET;
+	const simd_t vr = _mm_load_pd(args.pRsrc + pos);
+	const simd_t vg = _mm_load_pd(args.pGsrc + pos);
+	const simd_t vb = _mm_load_pd(args.pBsrc + pos);
+
+	simd_t L = _mm_mul_pd(vr, r_weight);
+	L = _mm_add_pd(L, _mm_mul_pd(g_weight,vg));
+	L = _mm_add_pd(L,_mm_mul_pd(b_weight,vb));
+	L = _mm_sub_pd(max_brightness, L);
+
+	*(simd_t*)(args.pRdst + pos) = L;
+	*(simd_t*)(args.pGdst + pos) = L;
+	*(simd_t*)(args.pBdst + pos) = L;
+}
+\end{lstlisting}
+
+\noindent Dado que el número total de píxeles puede no ser múltiplo exacto de 2, hay un bucle residual que procesa los píxeles restantes de forma escalar, empleando la misma lógica que en la versión monohilo. Finalmente, se libera la memoria alineada con \texttt{\_mm\_free()} para evitar fugas de memoria. A continuación, se muestran las imágenes resultantes:
+\vspace{1ex}
+\begin{center}
+
+\begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[height=5cm,keepaspectratio]{ImagenOriginal.png}
+\end{minipage}%
+\begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[height=5cm,keepaspectratio]{ImagenResultanteSimd.png}
+\end{minipage}
+\end{center}
+\vspace{3ex}
+
+\subsubsection{Paralelización Multihilo}
+Para la paralelización multihilo, se utilizó la librería \texttt{pthread.h} para crear y gestionar múltiples hilos de ejecución. El objetivo es dividir la carga de trabajo entre varios núcleos del procesador, empleando 8 hilos de ejecución (\texttt{NUM\_THREADS = 8}) para distribuir la imagen en fragmentos que se pueden procesar de forma concurrente.\vspace{2ex}
+
+\noindent La estructura \texttt{filter\_args\_t} se amplió con dos campos adicionales (\texttt{start} y \texttt{end}) que delimitan el rango de píxeles que cada hilo debe procesar, para trabajar sobre porciones independientes de la imagen:
+\begin{lstlisting}[style=cppStyle]
+typedef struct {
+	data_t *pRsrc;
+	data_t *pGsrc;
+	data_t *pBsrc;
+	data_t *pRdst;
+	data_t *pGdst;
+	data_t *pBdst;
+	uint pixelCount;
+	uint start, end;
+} filter_args_t;
+\end{lstlisting}
+\vspace{2ex}
+
+\noindent La función \texttt{thread\_filter()} se ejecuta en cada hilo, donde recibe los punteros a los datos y rango de píxeles a procesar. Primero ajusta los punteros aplicando el \textit{offset start}, calcula la longitud del segmento y procesa los píxeles dentro de ese rango aplicando el mismo algoritmo que en la versión monohilo:
+\begin{lstlisting}[style=cppStyle]
+void* thread_filter(void* args){
+    filter_args_t* tArgs = (filter_args_t*) args;
+    
+    data_t *pR = tArgs->pRsrc + tArgs->start;
+    data_t *pG = tArgs->pGsrc + tArgs->start;
+    data_t *pB = tArgs->pBsrc + tArgs->start;
+    data_t *pRdst = tArgs->pRdst + tArgs->start;
+    data_t *pGdst = tArgs->pGdst + tArgs->start;
+    data_t *pBdst = tArgs->pBdst + tArgs->start;
+    
+    uint length = tArgs->end - tArgs->start;
+    
+    // Procesamiento análogo al filtro monohilo
+    
+    pthread_exit(NULL);
+}
+\end{lstlisting}
+\vspace{2ex}
+
+\noindent La función \texttt{execute\_multithreaded\_filter()} se encarga de coordinar la ejecución paralela. Para ello, calcula los píxeles por hilo, crea los hilos con \texttt{pthread\_create()} y espera a que terminen con \texttt{pthread\_join()}. El último hilo se encarga de procesar cualquier píxel restante en caso de que el total no sea divisible por el número de hilos:
+\begin{lstlisting}[style=cppStyle]
+void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThread) {
+	pthread_t threads[NUM_THREADS];
+	filter_args_t thread_args[NUM_THREADS];
+	
+	for (uint t = 0; t < NUM_THREADS; t++) {
+		thread_args[t] = *filter_args;
+		
+		thread_args[t].start = t * pixelsPerThread;
+		thread_args[t].end = (t == NUM_THREADS - 1) ? filter_args->pixelCount : (t + 1) * pixelsPerThread;
+		
+		if(pthread_create(&threads[t], NULL, thread_filter, &thread_args[t]) != 0){
+			fprintf(stderr, "Error creating thread");
+			exit(EXIT_FAILURE);
+		}
+	}
+	
+	for (uint t = 0; t < NUM_THREADS; t++) {
+		if (pthread_join(threads[t], NULL) != 0) {
+			fprintf(stderr, "Error joining thread %d\n", t);
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+\end{lstlisting}
+\vspace{2ex}
+
+\noindent Finalmente, en la función principal, se calcula el número de píxeles por hilo y se llama a \texttt{execute\_multithreaded\_filter()} para iniciar el procesamiento paralelo. Esta función se ejecutará el número de veces fijado para medir el tiempo total de ejecución. A continuación, se muestran las imágenes resultantes:
+\vspace{2ex}
+\begin{center}
+\begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[height=5cm,keepaspectratio]{ImagenOriginal.png}
+\end{minipage}%
+\begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[height=5cm,keepaspectratio]{ImagenResultanteMultihilo.png}
+\end{minipage}
+\end{center}
+\newpage
 
 \section{Resultados y Análisis}
-(Se deben incluir los tiempos de ejecución, comparativas entre versiones y gráficos de rendimiento.)
+\subsection{Medición del rendimiento}
+Para la obtención de resultados, se midió el tiempo de ejecución de las distintas versiones del filtro (monohilo, SIMD y multihilo) utilizando la función \texttt{clock\_gettime()}. Para evitar variaciones debidas a la carga del sistema, se realizaron múltiples ejecuciones (10 repeticiones) y se calculó el tiempo promedio. A continuación se muestran los resultados obtenidos:
+\begin{center}
+    \begin{tabular}{l|cccccccccc}
+        \textbf{Versión} & T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8 & T9 & T10 \\
+        \hline \hline
+        Monohilo & 10.27 & 10.54 & 10.64 & 10.43 & 10.49 & 10.30 & 10.33 & 10.38 & 10.35 & 10.21\\[1ex]
+        Multihilo & 6.72 & 6.58 & 6.57 & 6.60 & 6.54 & 6.49 & 6.47 & 6.63 & 6.56 & 6.72 \\[1ex]
+        SIMD & 13.96 & 14.22 & 13.98 & 14.13 & 13.70 & 13.82 & 14.12 & 13.71 & 14.10 & 14.29
+    \end{tabular}
+\end{center}
+\vspace{2ex}
 
-\section{Conclusiones}
-(Se deben exponer los principales aprendizajes, la mejora de rendimiento observada y las implicaciones del uso de SIMD y multihilo en procesamiento de imágenes.)
+\noindent A partir de los datos obtenidos, se calcularon una serie de medidas estadísticas para resumir la información, aplicando medidas de centralización y dispersión. Cabe destacar que, por la presencia de algunos \textit{outliers}, la aproximación del intervalo de confianza mediante el \textit{Teorema Central del Límite} ha dado valores algo imprecisos, por lo que se ha añadido un calculo más preciso empleando la distribución \textit{t-Student} (identificado como \textit{IC - TS}).\vspace{2ex}
+\begin{center}
+    \begin{tabular}{l|ccccc}
+        \textbf{Versión} & Media (s) & DT (s) & IC - TCL (s) & IC - TS (s) & Product. \(\left(\frac{\text{tareas}}{\text{min}}\right)\)\\ 
+        \hline \hline
+        Monohilo & 10.39 & 0.13 & [10.13, 10.66] & [10.35, 10.44] & 5.77 \\[1ex]
+        Multihilo & 6.59 & 0.08 & [6.42, 6.76] & [6.56, 6.62] & 9.11 \\[1ex]
+        SIMD & 14.00 & 0.21 & [13.59, 14.42] & [13.93, 14.08] & 4.29
+    \end{tabular}
+\end{center}
+\vspace{2ex}
+
+\noindent A continuación se han calculado las respectivas aceleraciones de las versiones optimizadas respecto a la versión monohilo:
+\begin{align*}
+    \text{Aceleración Multihilo} = \frac{10.39}{6.59} \approx 1.58 \qquad
+    \text{Aceleración SIMD} = \frac{10.39}{14.00} \approx 0.74
+\end{align*}
+
+\noindent A modo de resumen visual, se presentan los siguientes gráficos que ilustran los tiempos de ejecución y las aceleraciones obtenidas:
+\vspace{2ex}
+\begin{center}
+    
+
+\begin{minipage}{0.61\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{grafico-barras.png}
+\end{minipage}
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{boxplot.png}
+\end{minipage}
+\end{center}
+\vspace{3ex}
+
+\subsection{Análisis de la versión multihilo}
+La implementación multihilo ha mostrado una mejora de rendimiento 
+de aproximadamente \textbf{1.58} respecto a la versión monohilo. Aunque esta 
+mejora es significativa, está muy lejos del teórico ideal de x16 (usando 16 hilos). No obstante 
+se han utilizado 8 hilos por motivos que se tratarán más adelante. Todo esto resulta en una eficiencia del \textbf{19.75\%}, lo cual indica que existen cuellos de botella en algunos puntos del proceso. Las posibles causas incluyen:
+\begin{itemize}
+    \item \textbf{Contención de recursos}: Aunque cada hilo trabaja sobre un segmento independiente de la imagen, 
+    a partir de cierto número de hilos aparece contención 
+    en la memoria caché. Cuando demasiados hilos acceden simultáneamente 
+    a regiones de memoria cercanas aumenta el número de fallos de caché. Esto hace que el rendimiento pase a estar limitado por el subsistema de memoria, es por ello que hemos decidido 
+    limitar el número de hilos a 8.
+    \item \textbf{Overhead de creación/destrucción de hilos}: En cada iteración se crean y destruyen 8 hilos, lo que introduce un coste adicional en el tiempo total. Se ha mantenido este enfoque por indicaciones presentes en la rúbrica de evaluación.
+    \item \textbf{Tamaño de trabajo insuficiente por hilo}: Dado que la imagen no es extremadamente grande,las operaciones de sincronización pueden suponer un tiempo considerable en comparación con las operaciones de suma/multiplicación realizadas.
+\end{itemize}
+\vspace{3ex}
+
+\subsection{Análisis de la versión SIMD}
+Los resultados de la versión SIMD son especialmente sorprendentes: en lugar de mejorar el rendimiento,
+ esta implementación resulta \textbf{0.74x más lenta} que la versión 
+ monohilo original. Se ha comprobado en varios ordenadores con diferentes
+  procesadores y, en todos, los resultados son similares. 
+  Se ha verificado que todos ellos tuvieran soporte para las 
+  instrucciones necesarias y que el código estuviera optimizado. Algunas posibles causas de este comportamiento incluyen:
+\begin{itemize}
+    \item \textbf{Overhead en la gestión de memoria}: La utilización de memoria alineada y las operaciones de carga/almacenamiento SIMD pueden introducir un overhead que no compensa la paralelización a nivel de datos, especialmente si el tamaño de los datos no es lo suficientemente grande.
+    \item \textbf{Limitaciones del compilador}: Es posible que el compilador no esté optimizando adecuadamente el código SIMD, o que las instrucciones generadas no sean las más eficientes para el hardware específico.
+\end{itemize}
+\newpage
+
+\subsection{diffImages}
+A continuación, se muestra el resultado de aplicar la herramienta \texttt{diffImages} para comparar las imágenes generadas por las distintas versiones multihilo y SIMD del filtro con la imagen generada por la versión monohilo. En ambos casos, el resultado es una imagen completamente negra, lo que indica que no hay diferencias entre las imágenes. Además, se muestran las metricas proporcionadas por \texttt{diffImages}. 
+\begin{itemize}
+    \item \textbf{Multihilo}
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{diffImg-multi.png}
+\end{minipage}
+\end{center}
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{diffImg-multi-tiempos.png}
+\end{minipage}
+\end{center}
+    \item \textbf{SIMD}
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{diffImg-simd.png}
+\end{minipage}
+\end{center}
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{diffImg-simd-tiempos.png}
+\end{minipage}
+\end{center}
+\end{itemize}
+\vspace{2ex}
+
+
+\newpage\subsection{Metodología de trabajo}
+El desarrollo del proyecto se llevó a cabo mediante una metodología colaborativa de carácter modular, fundamentada en la división funcional del sistema y en el uso riguroso de \textit{Git} y \textit{GitHub} como herramientas centrales de control de versiones. Cada integrante del equipo asumió la responsabilidad completa de un componente del proyecto —incluyendo su implementación, verificación y documentación— lo que permitió una organización eficiente del trabajo y una especialización técnica adecuada en cada módulo. \vspace{2ex}
+
+\noindent El flujo de trabajo adoptado se estructuró conforme al modelo de \textit{feature branching}. Cada funcionalidad fue desarrollada en una rama independiente derivada de la rama principal \texttt{main}, y su incorporación al proyecto se realizó mediante \textit{pull requests}. Este procedimiento garantizó un proceso de \textit{code review} sistemático, facilitando la detección de inconsistencias, la resolución de conflictos y el aseguramiento de la coherencia entre módulos. Asimismo, este enfoque proporcionó trazabilidad completa sobre los cambios efectuados y fomentó una colaboración asíncrona ordenada y transparente. \vspace{2ex}
+
+\noindent El repositorio que recoge el trabajo desarrollado se encuentra disponible en \textit{GitHub}: 
+
+\noindent \href{https://github.com/PabloGarPe/fcrtrabajo}{https://github.com/Mendana/teamwork-ac-2025}. \vspace{2ex}
+
+\subsection{Distribución de tareas}
+La distribución del trabajo se realizó asignando a cada miembro del equipo un conjunto definido de responsabilidades, correspondientes a distintas etapas del proyecto. Tras la fase de implementación individual, se desarrolló un proceso de revisión conjunta mediante sesiones internas y a través de las \textit{pull requests} del repositorio, con el fin de garantizar una visión compartida del funcionamiento global del sistema. Las optimizaciones del código 
+se realizaron de forma cruzada para que todos los integrantes trabajasen 
+sobre el código.
+\vspace{2ex}
+
+\subsection{Tiempos de desarrollo}
+En la siguiente tabla se presenta una estimación del tiempo dedicado por cada integrante, incluyendo tanto las tareas individuales como las actividades de coordinación y revisión colectiva: \vspace{2ex}
+
+\begin{center}
+  \begin{tabular}{|c|c|}
+    \hline
+    \textbf{Integrante} & \textbf{Tiempo dedicado} \\
+    \hline
+    Diego Díaz Mendaña & 5 horas \\
+    Pablo García Pernas & 5 horas \\
+    Fernando Suárez Fernández & 5 horas \\
+    Mateo Rama García & 5 horas \\
+    \hline
+  \end{tabular}
+\end{center}
 
 \newpage
 \part*{ANEXOS}
@@ -271,11 +575,12 @@ Todo el desarrollo del proyecto se encuentra disponible en el repositorio de \te
 \label{anexo:metodologia}
 El equipo adoptó una metodología ágil adaptada al contexto académico, inspirada en un enfoque híbrido entre \textit{Scrum} y \textit{Kanban}. Los elementos principales de esta metodología son:
 \begin{itemize}
-    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) que corresponden a las entregas del proyecto.
-    \item Las tareas se dividen en \textbf{issues} manejables, priorizadas según su relevancia y dependencias, y se asignan a los miembros del equipo.
-    \item El \textbf{Project Board} facilita la visualización del progreso y la gestión eficiente de las tareas.
-    \item La revisión colectiva de los \textit{pull requests} promueve la calidad del código y el aprendizaje conjunto.
+    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) correspondientes a las entregas del proyecto.
+    \item Las tareas se estructuran en \textbf{issues} manejables, priorizadas según su relevancia y dependencias.
+    \item El \textbf{Project Board} permite monitorizar el progreso y gestionar eficazmente la carga de trabajo.
+    \item La revisión de las \textit{pull requests} contribuye a garantizar la calidad del código y la uniformidad del estilo.
     \item Las dependencias entre tareas se gestionan mediante etiquetas y referencias cruzadas en \textit{GitHub}.
 \end{itemize}
+
 
 \end{document}
