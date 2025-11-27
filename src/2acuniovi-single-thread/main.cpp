@@ -1,7 +1,9 @@
 /*
- * Main.cpp
+ * 2acuniovi-simd/main.cpp
  *
- *  Created on: Fall 2019
+ * Image processing - Single-threaded version
+ * 
+ * @date 2025-27-10
  */
 
 #include <stdio.h>
@@ -42,31 +44,39 @@ typedef struct {
  * 
  * Formula:
  * 
- * Para cada i = 0,...,pixelCount:
- * 1) Convertir a B&W
+ * For each pixel i=0,...,pixelCount:
+ * 1) Convert to B&W
  * 	L(i) = 0.3 R(i) + 0.59 G(i) + 0.11 B(i)
- * 
- * 2) Invertir
+ * 2) Invert
  * 	L(i) = 255 - L(i)
- * 		
+ * 
+ * @param args Structure with filter arguments
+ * @return void		
  * *********************************************/
 void filter (filter_args_t args) {
+	// For each pixel
     for (uint i = 0; i < args.pixelCount; i++) {
+		// Convert to B&W
 		data_t L = *(args.pRsrc + i) * R_WEIGHT + 
 				*(args.pGsrc + i) * G_WEIGHT + 
 				*(args.pBsrc + i) * B_WEIGHT;
 		
+		// Invert
 		L = MAX_BRIGHTNESS - L;
 
+		// Store the result in all RGB components
 		*(args.pRdst + i) = L;
 		*(args.pGdst + i) = L;
 		*(args.pBdst + i) = L;
 	}
 }
 
+/**********************************************
+ * Main function
+ * ********************************************/
 int main() {
 	CImg<data_t> srcImage;
-	// Cargar imagen fuente - Controlando si existe
+	// Load source image if it exists
 	try {
     	srcImage = CImg<data_t>(SOURCE_IMG);
 	} catch (CImgException& e) {
