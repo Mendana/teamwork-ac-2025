@@ -2,16 +2,19 @@
 \contentsline {section}{\numberline {1}Introducción}{2}{section.1}%
 \contentsline {section}{\numberline {2}Máquina virtual}{2}{section.2}%
 \contentsline {section}{\numberline {3}Desarrollo del algoritmo}{2}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Comprobaciones e inicialización}{3}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Implementación del algoritmo}{3}{subsection.3.2}%
-\contentsline {section}{\numberline {4}Desarrollo del Proyecto}{5}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Fase 1: Implementación Monohilo}{5}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Fase 2: Optimización SIMD y Multihilo}{5}{subsection.4.2}%
-\contentsline {subsubsection}{\numberline {4.2.1}Optimización SIMD}{5}{subsubsection.4.2.1}%
-\contentsline {subsubsection}{\numberline {4.2.2}Paralelización Multihilo}{7}{subsubsection.4.2.2}%
-\contentsline {section}{\numberline {5}Resultados y Análisis}{9}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Medición del rendimiento}{9}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Análisis de la versión multihilo}{10}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Análisis de la versión SIMD}{10}{subsection.5.3}%
-\contentsline {section}{\numberline {A}Flujo de trabajo y metodología de desarrollo}{11}{appendix.Alph1}%
-\contentsline {subsection}{\numberline {A.1}Metodología}{11}{subsection.Alph1.1}%
+\contentsline {subsection}{\numberline {3.1}Implementación del algoritmo}{3}{subsection.3.1}%
+\contentsline {section}{\numberline {4}Desarrollo del Proyecto}{4}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Fase 1: Implementación Monohilo}{4}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Fase 2: Optimización SIMD y Multihilo}{4}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Optimización SIMD}{4}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Paralelización Multihilo}{6}{subsubsection.4.2.2}%
+\contentsline {section}{\numberline {5}Resultados y Análisis}{8}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Medición del rendimiento}{8}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Análisis de la versión multihilo}{9}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Análisis de la versión SIMD}{9}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}diffImages}{10}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Metodología de trabajo}{11}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Distribución de tareas}{11}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}Tiempos de desarrollo}{11}{subsection.5.7}%
+\contentsline {section}{\numberline {A}Flujo de trabajo y metodología de desarrollo}{12}{appendix.Alph1}%
+\contentsline {subsection}{\numberline {A.1}Metodología}{12}{subsection.Alph1.1}%
