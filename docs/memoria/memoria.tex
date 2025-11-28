@@ -284,7 +284,7 @@ const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
 \noindent Para tener un acceso eficiente a los datos, se utiliza \texttt{\_mm\_malloc()} con alineamiento a 16 bytes (tamaño de \texttt{\_\_m128d}). Además, para garantizar que cada componente de color ocupe un número de posiciones múltiplo del tamaño del paquete \texttt{SIMD}, se calcula la variable \texttt{pixelCountAligned}. Esta variable almacena el número de píxeles ajustado al siguiente múltiplo \texttt{ITEMS\_PER\_PACKET} (\(2\) en nuestro caso).
 \vspace{1ex}
 
-\noindent Sino se realizase este proceso, al almacenarse de manera contigua las componentes de color en memoria podría haber un paquete que tuviese componentes de distinto color. El padding añadido se elimina una vez se ha realizado el algoritmo y antes de la creación de la imagen final.
+\noindent Si no se realizase este proceso, al almacenarse de manera contigua las componentes de color en memoria podría haber un paquete que tuviese componentes de distinto color. El padding añadido se elimina una vez se ha realizado el algoritmo y antes de la creación de la imagen final.
 \begin{lstlisting}[style=cppStyle]
 uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
 pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
@@ -433,9 +433,9 @@ Para la obtención de resultados, se midió el tiempo de ejecución de las disti
     \begin{tabular}{l|ccccc}
         \textbf{Versión} & Media (s) & DT (s) & IC - TCL (s) & IC - TS (s) & Product. \(\left(\frac{\text{tareas}}{\text{min}}\right)\)\\ 
         \hline \hline
-        Monohilo & 10.39 & 0.13 & [10.13, 10.66] & [10.35, 10.44] & 5.77 \\[1ex]
-        Multihilo & 6.59 & 0.08 & [6.42, 6.76] & [6.56, 6.62] & 9.11 \\[1ex]
-        SIMD & 14.00 & 0.21 & [13.59, 14.42] & [13.93, 14.08] & 4.29
+        Monohilo & 10.39 & 0.13 & [10.13, 10.66] & [10.27, 10.51] & 5.77 \\[1ex]
+        Multihilo & 6.59 & 0.08 & [6.42, 6.76] & [6.51, 6.67] & 9.11 \\[1ex]
+        SIMD & 14.00 & 0.21 & [13.59, 14.42] & [13.81, 14.19] & 4.29
     \end{tabular}
 \end{center}
 \vspace{2ex}
@@ -526,63 +526,23 @@ A continuación, se muestra el resultado de aplicar la herramienta \texttt{diffI
 
 \newpage
 \section{Metodología de trabajo}
-El desarrollo del proyecto se llevó a cabo mediante una metodología colaborativa de carácter modular, fundamentada en la división funcional del sistema y en el uso riguroso de \textit{Git} y \textit{GitHub} como herramientas centrales de control de versiones. Cada integrante del equipo asumió la responsabilidad completa de un componente del proyecto —incluyendo su implementación, verificación y documentación— lo que permitió una organización eficiente del trabajo y una especialización técnica adecuada en cada módulo. \vspace{2ex}
-
-\noindent El flujo de trabajo adoptado se estructuró conforme al modelo de \textit{feature branching}. Cada funcionalidad fue desarrollada en una rama independiente derivada de la rama principal \texttt{main}, y su incorporación al proyecto se realizó mediante \textit{pull requests}. Este procedimiento garantizó un proceso de \textit{code review} sistemático, facilitando la detección de inconsistencias, la resolución de conflictos y el aseguramiento de la coherencia entre módulos. Asimismo, este enfoque proporcionó trazabilidad completa sobre los cambios efectuados y fomentó una colaboración asíncrona ordenada y transparente. \vspace{2ex}
-
-\noindent El repositorio que recoge el trabajo desarrollado se encuentra disponible en \textit{GitHub}: 
-
-\noindent \href{https://github.com/PabloGarPe/fcrtrabajo}{https://github.com/Mendana/teamwork-ac-2025}. \vspace{2ex}
+El desarrollo del proyecto se llevó a cabo mediante el uso riguroso de \textit{Git} y \textit{GitHub}.
+El flujo de trabajo adoptado se estructuró conforme al modelo de \textit{feature branching}. Cada funcionalidad fue desarrollada en una rama independiente derivada de la rama principal \texttt{main}, y su incorporación al proyecto se realizó mediante \textit{pull requests}. Este procedimiento garantizó un proceso de revisión de código sistemático, facilitando la detección de inconsistencias y la resolución de conflicto. El repositorio que recoge el trabajo desarrollado se encuentra disponible en \textit{GitHub}:  \href{https://github.com/PabloGarPe/fcrtrabajo}{https://github.com/Mendana/teamwork-ac-2025}. \vspace{2ex}
 
 \subsection{Distribución de tareas}
-La distribución del trabajo se realizó asignando a cada miembro del equipo un conjunto definido de responsabilidades, correspondientes a distintas etapas del proyecto. Tras la fase de implementación individual, se desarrolló un proceso de revisión conjunta mediante sesiones internas y a través de las \textit{pull requests} del repositorio, con el fin de garantizar una visión compartida del funcionamiento global del sistema. Las optimizaciones del código 
+La distribución del trabajo se realizó asignando a cada miembro del equipo un conjunto definido de responsabilidades, correspondientes a distintas etapas del proyecto. Tras la fase de implementación individual, se desarrolló un proceso de revisión conjunta, con el fin de garantizar una visión compartida del funcionamiento global del trabajo. Las optimizaciones del código 
 se realizaron de forma cruzada para que todos los integrantes trabajasen 
-sobre el código.
-\vspace{2ex}
-
-\subsection{Tiempos de desarrollo}
-En la siguiente tabla se presenta una estimación del tiempo dedicado por cada integrante, incluyendo tanto las tareas individuales como las actividades de coordinación y revisión colectiva: \vspace{2ex}
-
-\begin{center}
-  \begin{tabular}{|c|c|}
-    \hline
-    \textbf{Integrante} & \textbf{Tiempo dedicado} \\
-    \hline
-    Diego Díaz Mendaña & 5 horas \\
-    Pablo García Pernas & 5 horas \\
-    Fernando Suárez Fernández & 5 horas \\
-    Mateo Rama García & 5 horas \\
-    \hline
-  \end{tabular}
-\end{center}
-
-\newpage
-\part*{ANEXOS}
-\appendix
-\renewcommand{\thesection}{\Alph{section}}
-
-\section{Flujo de trabajo y metodología de desarrollo}
-Todo el desarrollo del proyecto se encuentra disponible en el repositorio de \textit{GitHub}: \href{https://www.github.com/Mendana/teamwork-ac-2025}{ver repositorio}. Para garantizar un trabajo colaborativo eficiente, se estableció un flujo de trabajo común basado en las herramientas \textit{Git} y \textit{GitHub} como elementos centrales de control de versiones. Los aspectos clave son:
-
+sobre el código. A continuación se detalla la contribución específica de cada miembro del equipo:
 \begin{itemize}
-    \item \textbf{Repositorio compartido:} Contiene el código, la documentación y los recursos del proyecto.
-    \item \textbf{Issues:} Cada tarea se define como una \textit{issue} en \textit{GitHub}, asignada a un responsable con una fecha límite.
-    \item \textbf{Project Board:} Se emplea un tablero \textit{Kanban} con las columnas \textit{To Do}, \textit{In Progress}, \textit{Review} y \textit{Done} para visualizar el progreso del trabajo.
-    \item \textbf{Milestones:} Cada entrega del proyecto se asocia a un \textit{milestone} que agrupa las \textit{issues} relacionadas.
-    \item \textbf{Pull Requests:} Todas las contribuciones se integran mediante \textit{pull requests}, revisadas y aprobadas por, al menos, tres de los cuatro miembros del equipo antes de fusionarse en la rama principal.
-    \item \textbf{Documentación:} Se conserva en la carpeta \texttt{docs/}.
+    \item \textbf{Fernando Suárez Fernández}: Desarrollo del algoritmo de filtro de la versión monohilo y estructura del SIMD. Revisión y corrección de errores tanto en el código como en la memoria.
+    \item \textbf{Pablo García Pernas}: Estructura de la versión monohilo, optimización del SIMD y testing de los algoritmos. Revisión y corrección de errores tanto en el código como en la memoria.
+    \item \textbf{Mateo Rama García}: Implementación de la versión multihilo y redacción de parte de la memoria. Optimización de la versión SIMD, testing de algoritmos y corrrección de errores en el código.
+    \item \textbf{Diego Díaz Mendaña}: Organización del repositorio y asignación de tareas. Optimización de la versión multihilo y análisis de resultados obtenidos. Redacción de parte de la memoria y revisión de errores 
+    en el código.
+   
 \end{itemize}
+\vspace{1ex}
 
-\subsection{Metodología}
-\label{anexo:metodologia}
-El equipo adoptó una metodología ágil adaptada al contexto académico, inspirada en un enfoque híbrido entre \textit{Scrum} y \textit{Kanban}. Los elementos principales de esta metodología son:
-\begin{itemize}
-    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) correspondientes a las entregas del proyecto.
-    \item Las tareas se estructuran en \textbf{issues} manejables, priorizadas según su relevancia y dependencias.
-    \item El \textbf{Project Board} permite monitorizar el progreso y gestionar eficazmente la carga de trabajo.
-    \item La revisión de las \textit{pull requests} contribuye a garantizar la calidad del código y la uniformidad del estilo.
-    \item Las dependencias entre tareas se gestionan mediante etiquetas y referencias cruzadas en \textit{GitHub}.
-\end{itemize}
-
+Estimamos que la distribución del trabajo ha sido equitativa (25\%), permitiendo a cada miembro del equipo contribuir de manera significativa al desarrollo del proyecto.
 
 \end{document}

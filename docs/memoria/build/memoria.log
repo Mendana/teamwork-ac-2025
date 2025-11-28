@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.4) (preloaded format=xelatex 2025.9.29)  28 NOV 2025 10:36
+This is XeTeX, Version 3.141592653-2.6-0.999997 (MiKTeX 25.4) (preloaded format=xelatex 2025.9.29)  28 NOV 2025 12:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1229,8 +1229,6 @@ File: images/diffImg-simd-tiempos.png Graphic file (type bmp)
 [10]
 
 [11]
-
-[12]
 (c:\Users\Usuario\Desktop\Trabajo AC\teamwork-ac-2025\docs\memoria\build\memori
 a.aux
 LaTeX Info: Redefining \. on input line 12.
@@ -1241,16 +1239,16 @@ LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-09-02>
  ***********
 Package rerunfilecheck Info: File `memoria.out' has not changed.
-(rerunfilecheck)             Checksum: C3CACA8B9E5DA9FED5B78DE331D13263;3428.
+(rerunfilecheck)             Checksum: 47536F4A163FDEC21A0956AF190D11BC;2844.
  ) 
 Here is how much of TeX's memory you used:
- 32452 strings out of 403246
- 685196 string characters out of 5460367
+ 32445 strings out of 403246
+ 685020 string characters out of 5460367
  1226118 words of memory out of 5000000
- 60441 multiletter control sequences out of 15000+600000
- 633780 words of font info for 98 fonts, out of 8000000 for 9000
+ 60437 multiletter control sequences out of 15000+600000
+ 633764 words of font info for 96 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 98i,17n,101p,756b,1892s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,17n,101p,735b,1892s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on c:\Users\Usuario\Desktop\Trabajo AC\teamwork-ac-2025\docs\mem
-oria\build\memoria.pdf (13 pages).
+oria\build\memoria.pdf (12 pages).
