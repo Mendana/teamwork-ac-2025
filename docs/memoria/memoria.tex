@@ -168,7 +168,7 @@
 \newpage
 
 \section{Introducción}
-La presente memoria recoge el desarrollo del proyecto correspondiente a la asignatura \textit{Arquitectura de Computadores}, impartida durante el curso académico 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El objetivo del proyecto es aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Asimismo, se realiza un análisis del rendimiento del filtro y una comparación entre las versiones monohilo y multihilo.
+La presente memoria recoge el desarrollo del proyecto correspondiente a la asignatura \textit{Arquitectura de Computadores}, impartida durante el curso académico 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El objetivo del proyecto es aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Asimismo, se realiza un análisis del rendimiento del filtro y una comparación de la versión monohilo con versiones optimizadas mediante técnicas SIMD y multihilo.
 \vspace{2ex}
 
 \section{Máquina virtual}
@@ -281,17 +281,23 @@ const simd_t b_weight = _mm_set1_pd(B_WEIGHT);
 const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
 \end{lstlisting}
 
-\noindent Para tener un acceso eficiente a los datos, se utiliza \texttt{\_mm\_malloc()} con alineamiento a 16 bytes (tamaño de \texttt{\_\_m128d}). También se asegura el tamaño del buffer de destino para que tenga capacidad suficiente:
+\noindent Para tener un acceso eficiente a los datos, se utiliza \texttt{\_mm\_malloc()} con alineamiento a 16 bytes (tamaño de \texttt{\_\_m128d}). Además, para garantizar que cada componente de color ocupe un número de posiciones múltiplo del tamaño del paquete \texttt{SIMD}, se calcula la variable \texttt{pixelCountAligned}. Esta variable almacena el número de píxeles ajustado al siguiente múltiplo \texttt{ITEMS\_PER\_PACKET} (\(2\) en nuestro caso).
+\vspace{1ex}
+
+\noindent Sino se realizase este proceso, al almacenarse de manera contigua las componentes de color en memoria podría haber un paquete que tuviese componentes de distinto color. El padding añadido se elimina una vez se ha realizado el algoritmo y antes de la creación de la imagen final.
 \begin{lstlisting}[style=cppStyle]
 uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
 pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
 \end{lstlisting}
-
+ 
+\vspace{1ex}
 \noindent El bucle principal del filtro procesa la imagen en paquetes de dos píxeles. Para cada paquete, 
-se cargan los valores RGB mediante \texttt{\_mm\_loadu\_pd()} para mantener la coherencia, aunque en este 
-caso los datos estén alineados (se podría usar \texttt{\_mm\_load\_pd()}). Finalmente, se calcula la luminosidad 
-ponderada con \texttt{\_mm\_mul\_pd()} y \texttt{\_mm\_add\_pd()} y 
-finalmente se invierte con \texttt{\_mm\_sub\_pd()}. 
+se cargan los valores RGB mediante \texttt{\_mm\_loadu\_pd()}. Aunque los datos están alineados en memoria 
+y se podría emplear \texttt{\_mm\_load\_pd()} para mejorar levemente la eficiencia, se optó por la versión no alineada 
+para evitar posibles errores si las direcciones de memoria no 
+cumplen estrictamente el alineamiento requerido. Posteriormente, se calcula la luminosidad 
+ponderada empleando \texttt{\_mm\_mul\_pd()} y \texttt{\_mm\_add\_pd()}, y 
+finalmente se invierte con \texttt{\_mm\_sub\_pd()}.
 \vspace{1ex}
 
 \noindent Hemos decidido no utilizar la instrucción
@@ -364,14 +370,11 @@ void* thread_filter(void* args){
     uint length = tArgs->end - tArgs->start;
     
     // Procesamiento análogo al filtro monohilo
-    
     pthread_exit(NULL);
 }
 \end{lstlisting}
-\vspace{1ex}
-
 \noindent La función \texttt{execute\_multithreaded\_filter()} se encarga de coordinar la ejecución paralela. Para ello, calcula los píxeles por hilo, crea los hilos con \texttt{pthread\_create()} y espera a que terminen con \texttt{pthread\_join()}. El último hilo se encarga de procesar cualquier píxel restante en caso de que el total no sea divisible por el número de hilos:
-\vspace{2ex}
+\vspace{1ex}
 
 \begin{lstlisting}[style=cppStyle]
 void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThread) {
@@ -397,8 +400,6 @@ void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThre
 	}
 }
 \end{lstlisting}
-\vspace{1ex}
-
 \noindent Finalmente, en la función principal, se calcula el número de píxeles por hilo y se llama a \texttt{execute\_multithreaded\_filter()} para iniciar el procesamiento paralelo. Esta función se ejecutará el número de veces fijado para medir el tiempo total de ejecución. A continuación, se muestran las imágenes resultantes:
 \vspace{1ex}
 \begin{center}
@@ -425,7 +426,7 @@ Para la obtención de resultados, se midió el tiempo de ejecución de las disti
         SIMD & 13.96 & 14.22 & 13.98 & 14.13 & 13.70 & 13.82 & 14.12 & 13.71 & 14.10 & 14.29
     \end{tabular}
 \end{center}
-\vspace{2ex}
+\vspace{1ex}
 
 \noindent A partir de los datos obtenidos, se calcularon una serie de medidas estadísticas para resumir la información, aplicando medidas de centralización y dispersión. Cabe destacar que, por la presencia de algunos \textit{outliers}, la aproximación del intervalo de confianza mediante el \textit{Teorema Central del Límite} ha dado valores algo imprecisos, por lo que se ha añadido un calculo más preciso empleando la distribución \textit{t-Student} (identificado como \textit{IC - TS}).\vspace{2ex}
 \begin{center}
