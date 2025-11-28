@@ -168,7 +168,7 @@
 \newpage
 
 \section{Introducción}
-La presente memoria recoge el desarrollo del proyecto correspondiente a la asignatura \textit{Arquitectura de Computadores}, impartida durante el curso académico 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El objetivo del proyecto es aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Asimismo, se realiza un análisis del rendimiento del filtro y una comparación entre las versiones monohilo y multihilo.
+La presente memoria recoge el desarrollo del proyecto correspondiente a la asignatura \textit{Arquitectura de Computadores}, impartida durante el curso académico 2025-2026 en la Escuela de Ingeniería Informática de Oviedo. El objetivo del proyecto es aplicar los conocimientos adquiridos en la asignatura para diseñar e implementar un filtro de imágenes en lenguaje \texttt{C/C++}. Asimismo, se realiza un análisis del rendimiento del filtro y una comparación de la versión monohilo con versiones optimizadas mediante técnicas SIMD y multihilo.
 \vspace{2ex}
 
 \section{Máquina virtual}
@@ -269,7 +269,7 @@ En la primera fase del proyecto se desarrolló la versión monohilo del algoritm
 En la segunda fase del proyecto, se optimizó el algoritmo mediante el uso de instrucciones SIMD y la paralelización con múltiples hilos. No obstante, los resultados no han mostrado una mejora significativa en el rendimiento, que posteriormente se analizará en detalle.\vspace{2ex}
 
 \subsubsection{Optimización SIMD}
-Para la optimización SIMD, se ha empleado la librería \texttt{immintrin.h} que proporciona acceso a las instrucciones \texttt{SSE} y \texttt{AVX}. Se han empleado paquetes de 128 bits (\texttt{\_\_m128d}) para procesar dos valores \texttt{double} simultáneamente. El objetivo es aprovechar el paralelismo de datos a nivel de instrucción para reducir el número de iteraciones necesarias procesando múltiples píxeles en cada ciclo.\vspace{2ex}
+Para la optimización SIMD, se ha empleado la librería \texttt{immintrin.h} que proporciona acceso a las instrucciones \texttt{SSE} y \texttt{AVX}. Se han empleado paquetes de 128 bits (\texttt{\_\_m128d}) para procesar dos valores \texttt{double} simultáneamente. El objetivo es aprovechar el paralelismo de datos a nivel de instrucción para reducir el número de iteraciones necesarias procesando múltiples píxeles en cada ciclo.\vspace{1ex}
 
 \noindent Para la inicialización de los vectores, las constantes de algoritmo se cargaron replicando el valor en ambos elementos del vector:
 \begin{lstlisting}[style=cppStyle]
@@ -281,17 +281,23 @@ const simd_t b_weight = _mm_set1_pd(B_WEIGHT);
 const simd_t max_brightness = _mm_set1_pd(MAX_BRIGHTNESS);
 \end{lstlisting}
 
-\noindent Para tener un acceso eficiente a los datos, se utiliza \texttt{\_mm\_malloc()} con alineamiento a 16 bytes (tamaño de \texttt{\_\_m128d}). También se asegura el tamaño del buffer de destino para que tenga capacidad suficiente:
+\noindent Para tener un acceso eficiente a los datos, se utiliza \texttt{\_mm\_malloc()} con alineamiento a 16 bytes (tamaño de \texttt{\_\_m128d}). Además, para garantizar que cada componente de color ocupe un número de posiciones múltiplo del tamaño del paquete \texttt{SIMD}, se calcula la variable \texttt{pixelCountAligned}. Esta variable almacena el número de píxeles ajustado al siguiente múltiplo \texttt{ITEMS\_PER\_PACKET} (\(2\) en nuestro caso).
+\vspace{1ex}
+
+\noindent Si no se realizase este proceso, al almacenarse de manera contigua las componentes de color en memoria podría haber un paquete que tuviese componentes de distinto color. El padding añadido se elimina una vez se ha realizado el algoritmo y antes de la creación de la imagen final.
 \begin{lstlisting}[style=cppStyle]
 uint pixelCountAligned = ((filter_args.pixelCount + ITEMS_PER_PACKET - 1) / ITEMS_PER_PACKET) * ITEMS_PER_PACKET;
 pDstImage = (data_t *) _mm_malloc (pixelCountAligned * nComp * sizeof(data_t), 16);
 \end{lstlisting}
-
+ 
+\vspace{1ex}
 \noindent El bucle principal del filtro procesa la imagen en paquetes de dos píxeles. Para cada paquete, 
-se cargan los valores RGB mediante \texttt{\_mm\_load\_pd()} (esto 
-es debido a que los datos ya están alineados), se calcula la luminosidad 
-ponderada con \texttt{\_mm\_mul\_pd()} y \texttt{\_mm\_add\_pd()} y 
-finalmente se invierte con \texttt{\_mm\_sub\_pd()}. 
+se cargan los valores RGB mediante \texttt{\_mm\_loadu\_pd()}. Aunque los datos están alineados en memoria 
+y se podría emplear \texttt{\_mm\_load\_pd()} para mejorar levemente la eficiencia, se optó por la versión no alineada 
+para evitar posibles errores si las direcciones de memoria no 
+cumplen estrictamente el alineamiento requerido. Posteriormente, se calcula la luminosidad 
+ponderada empleando \texttt{\_mm\_mul\_pd()} y \texttt{\_mm\_add\_pd()}, y 
+finalmente se invierte con \texttt{\_mm\_sub\_pd()}.
 \vspace{1ex}
 
 \noindent Hemos decidido no utilizar la instrucción
@@ -299,12 +305,11 @@ finalmente se invierte con \texttt{\_mm\_sub\_pd()}.
 separadamente redondea dos veces, lo que puede introducir pequeñas diferencias respecto a la imagen monohilo. 
 \begin{lstlisting}[style=cppStyle]
 const uint nPackets = (args.pixelCount / ITEMS_PER_PACKET);
-
 for(uint i = 0; i < nPackets; i++){
 	const uint pos = i * ITEMS_PER_PACKET;
-	const simd_t vr = _mm_load_pd(args.pRsrc + pos);
-	const simd_t vg = _mm_load_pd(args.pGsrc + pos);
-	const simd_t vb = _mm_load_pd(args.pBsrc + pos);
+	const simd_t vr = _mm_loadu_pd(args.pRsrc + pos);
+	const simd_t vg = _mm_loadu_pd(args.pGsrc + pos);
+	const simd_t vb = _mm_loadu_pd(args.pBsrc + pos);
 
 	simd_t L = _mm_mul_pd(vr, r_weight);
 	L = _mm_add_pd(L, _mm_mul_pd(g_weight,vg));
@@ -365,13 +370,12 @@ void* thread_filter(void* args){
     uint length = tArgs->end - tArgs->start;
     
     // Procesamiento análogo al filtro monohilo
-    
     pthread_exit(NULL);
 }
 \end{lstlisting}
-\vspace{2ex}
-
 \noindent La función \texttt{execute\_multithreaded\_filter()} se encarga de coordinar la ejecución paralela. Para ello, calcula los píxeles por hilo, crea los hilos con \texttt{pthread\_create()} y espera a que terminen con \texttt{pthread\_join()}. El último hilo se encarga de procesar cualquier píxel restante en caso de que el total no sea divisible por el número de hilos:
+\vspace{1ex}
+
 \begin{lstlisting}[style=cppStyle]
 void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThread) {
 	pthread_t threads[NUM_THREADS];
@@ -379,7 +383,6 @@ void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThre
 	
 	for (uint t = 0; t < NUM_THREADS; t++) {
 		thread_args[t] = *filter_args;
-		
 		thread_args[t].start = t * pixelsPerThread;
 		thread_args[t].end = (t == NUM_THREADS - 1) ? filter_args->pixelCount : (t + 1) * pixelsPerThread;
 		
@@ -397,10 +400,8 @@ void execute_multithreaded_filter(filter_args_t* filter_args, uint pixelsPerThre
 	}
 }
 \end{lstlisting}
-\vspace{2ex}
-
 \noindent Finalmente, en la función principal, se calcula el número de píxeles por hilo y se llama a \texttt{execute\_multithreaded\_filter()} para iniciar el procesamiento paralelo. Esta función se ejecutará el número de veces fijado para medir el tiempo total de ejecución. A continuación, se muestran las imágenes resultantes:
-\vspace{2ex}
+\vspace{1ex}
 \begin{center}
 \begin{minipage}{0.49\textwidth}
     \centering
@@ -425,16 +426,16 @@ Para la obtención de resultados, se midió el tiempo de ejecución de las disti
         SIMD & 13.96 & 14.22 & 13.98 & 14.13 & 13.70 & 13.82 & 14.12 & 13.71 & 14.10 & 14.29
     \end{tabular}
 \end{center}
-\vspace{2ex}
+\vspace{1ex}
 
 \noindent A partir de los datos obtenidos, se calcularon una serie de medidas estadísticas para resumir la información, aplicando medidas de centralización y dispersión. Cabe destacar que, por la presencia de algunos \textit{outliers}, la aproximación del intervalo de confianza mediante el \textit{Teorema Central del Límite} ha dado valores algo imprecisos, por lo que se ha añadido un calculo más preciso empleando la distribución \textit{t-Student} (identificado como \textit{IC - TS}).\vspace{2ex}
 \begin{center}
     \begin{tabular}{l|ccccc}
         \textbf{Versión} & Media (s) & DT (s) & IC - TCL (s) & IC - TS (s) & Product. \(\left(\frac{\text{tareas}}{\text{min}}\right)\)\\ 
         \hline \hline
-        Monohilo & 10.39 & 0.13 & [10.13, 10.66] & [10.35, 10.44] & 5.77 \\[1ex]
-        Multihilo & 6.59 & 0.08 & [6.42, 6.76] & [6.56, 6.62] & 9.11 \\[1ex]
-        SIMD & 14.00 & 0.21 & [13.59, 14.42] & [13.93, 14.08] & 4.29
+        Monohilo & 10.39 & 0.13 & [10.13, 10.66] & [10.27, 10.51] & 5.77 \\[1ex]
+        Multihilo & 6.59 & 0.08 & [6.42, 6.76] & [6.51, 6.67] & 9.11 \\[1ex]
+        SIMD & 14.00 & 0.21 & [13.59, 14.42] & [13.81, 14.19] & 4.29
     \end{tabular}
 \end{center}
 \vspace{2ex}
@@ -523,64 +524,25 @@ A continuación, se muestra el resultado de aplicar la herramienta \texttt{diffI
 \vspace{2ex}
 
 
-\newpage\subsection{Metodología de trabajo}
-El desarrollo del proyecto se llevó a cabo mediante una metodología colaborativa de carácter modular, fundamentada en la división funcional del sistema y en el uso riguroso de \textit{Git} y \textit{GitHub} como herramientas centrales de control de versiones. Cada integrante del equipo asumió la responsabilidad completa de un componente del proyecto —incluyendo su implementación, verificación y documentación— lo que permitió una organización eficiente del trabajo y una especialización técnica adecuada en cada módulo. \vspace{2ex}
-
-\noindent El flujo de trabajo adoptado se estructuró conforme al modelo de \textit{feature branching}. Cada funcionalidad fue desarrollada en una rama independiente derivada de la rama principal \texttt{main}, y su incorporación al proyecto se realizó mediante \textit{pull requests}. Este procedimiento garantizó un proceso de \textit{code review} sistemático, facilitando la detección de inconsistencias, la resolución de conflictos y el aseguramiento de la coherencia entre módulos. Asimismo, este enfoque proporcionó trazabilidad completa sobre los cambios efectuados y fomentó una colaboración asíncrona ordenada y transparente. \vspace{2ex}
-
-\noindent El repositorio que recoge el trabajo desarrollado se encuentra disponible en \textit{GitHub}: 
-
-\noindent \href{https://github.com/PabloGarPe/fcrtrabajo}{https://github.com/Mendana/teamwork-ac-2025}. \vspace{2ex}
+\newpage
+\section{Metodología de trabajo}
+El desarrollo del proyecto se llevó a cabo mediante el uso riguroso de \textit{Git} y \textit{GitHub}.
+El flujo de trabajo adoptado se estructuró conforme al modelo de \textit{feature branching}. Cada funcionalidad fue desarrollada en una rama independiente derivada de la rama principal \texttt{main}, y su incorporación al proyecto se realizó mediante \textit{pull requests}. Este procedimiento garantizó un proceso de revisión de código sistemático, facilitando la detección de inconsistencias y la resolución de conflicto. El repositorio que recoge el trabajo desarrollado se encuentra disponible en \textit{GitHub}:  \href{https://github.com/PabloGarPe/fcrtrabajo}{https://github.com/Mendana/teamwork-ac-2025}. \vspace{2ex}
 
 \subsection{Distribución de tareas}
-La distribución del trabajo se realizó asignando a cada miembro del equipo un conjunto definido de responsabilidades, correspondientes a distintas etapas del proyecto. Tras la fase de implementación individual, se desarrolló un proceso de revisión conjunta mediante sesiones internas y a través de las \textit{pull requests} del repositorio, con el fin de garantizar una visión compartida del funcionamiento global del sistema. Las optimizaciones del código 
+La distribución del trabajo se realizó asignando a cada miembro del equipo un conjunto definido de responsabilidades, correspondientes a distintas etapas del proyecto. Tras la fase de implementación individual, se desarrolló un proceso de revisión conjunta, con el fin de garantizar una visión compartida del funcionamiento global del trabajo. Las optimizaciones del código 
 se realizaron de forma cruzada para que todos los integrantes trabajasen 
-sobre el código.
-\vspace{2ex}
-
-\subsection{Tiempos de desarrollo}
-En la siguiente tabla se presenta una estimación del tiempo dedicado por cada integrante, incluyendo tanto las tareas individuales como las actividades de coordinación y revisión colectiva: \vspace{2ex}
-
-\begin{center}
-  \begin{tabular}{|c|c|}
-    \hline
-    \textbf{Integrante} & \textbf{Tiempo dedicado} \\
-    \hline
-    Diego Díaz Mendaña & 5 horas \\
-    Pablo García Pernas & 5 horas \\
-    Fernando Suárez Fernández & 5 horas \\
-    Mateo Rama García & 5 horas \\
-    \hline
-  \end{tabular}
-\end{center}
-
-\newpage
-\part*{ANEXOS}
-\appendix
-\renewcommand{\thesection}{\Alph{section}}
-
-\section{Flujo de trabajo y metodología de desarrollo}
-Todo el desarrollo del proyecto se encuentra disponible en el repositorio de \textit{GitHub}: \href{https://www.github.com/Mendana/teamwork-ac-2025}{ver repositorio}. Para garantizar un trabajo colaborativo eficiente, se estableció un flujo de trabajo común basado en las herramientas \textit{Git} y \textit{GitHub} como elementos centrales de control de versiones. Los aspectos clave son:
-
+sobre el código. A continuación se detalla la contribución específica de cada miembro del equipo:
 \begin{itemize}
-    \item \textbf{Repositorio compartido:} Contiene el código, la documentación y los recursos del proyecto.
-    \item \textbf{Issues:} Cada tarea se define como una \textit{issue} en \textit{GitHub}, asignada a un responsable con una fecha límite.
-    \item \textbf{Project Board:} Se emplea un tablero \textit{Kanban} con las columnas \textit{To Do}, \textit{In Progress}, \textit{Review} y \textit{Done} para visualizar el progreso del trabajo.
-    \item \textbf{Milestones:} Cada entrega del proyecto se asocia a un \textit{milestone} que agrupa las \textit{issues} relacionadas.
-    \item \textbf{Pull Requests:} Todas las contribuciones se integran mediante \textit{pull requests}, revisadas y aprobadas por, al menos, tres de los cuatro miembros del equipo antes de fusionarse en la rama principal.
-    \item \textbf{Documentación:} Se conserva en la carpeta \texttt{docs/}.
+    \item \textbf{Fernando Suárez Fernández}: Desarrollo del algoritmo de filtro de la versión monohilo y estructura del SIMD. Revisión y corrección de errores tanto en el código como en la memoria.
+    \item \textbf{Pablo García Pernas}: Estructura de la versión monohilo, optimización del SIMD y testing de los algoritmos. Revisión y corrección de errores tanto en el código como en la memoria.
+    \item \textbf{Mateo Rama García}: Implementación de la versión multihilo y redacción de parte de la memoria. Optimización de la versión SIMD, testing de algoritmos y corrrección de errores en el código.
+    \item \textbf{Diego Díaz Mendaña}: Organización del repositorio y asignación de tareas. Optimización de la versión multihilo y análisis de resultados obtenidos. Redacción de parte de la memoria y revisión de errores 
+    en el código.
+   
 \end{itemize}
+\vspace{1ex}
 
-\subsection{Metodología}
-\label{anexo:metodologia}
-El equipo adoptó una metodología ágil adaptada al contexto académico, inspirada en un enfoque híbrido entre \textit{Scrum} y \textit{Kanban}. Los elementos principales de esta metodología son:
-\begin{itemize}
-    \item La planificación se organiza en \textbf{iteraciones} (\textit{milestones}) correspondientes a las entregas del proyecto.
-    \item Las tareas se estructuran en \textbf{issues} manejables, priorizadas según su relevancia y dependencias.
-    \item El \textbf{Project Board} permite monitorizar el progreso y gestionar eficazmente la carga de trabajo.
-    \item La revisión de las \textit{pull requests} contribuye a garantizar la calidad del código y la uniformidad del estilo.
-    \item Las dependencias entre tareas se gestionan mediante etiquetas y referencias cruzadas en \textit{GitHub}.
-\end{itemize}
-
+Estimamos que la distribución del trabajo ha sido equitativa (25\%), permitiendo a cada miembro del equipo contribuir de manera significativa al desarrollo del proyecto.
 
 \end{document}
